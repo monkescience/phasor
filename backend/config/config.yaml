@@ -1,0 +1,10 @@
+# Backend Service Configuration
+
+# Log configuration using vital library
+log_config:
+  # Log level: debug, info, warn, error
+  level: "info"
+  # Log format: json or text
+  format: "text"
+  # Include source file and line number in logs
+  add_source: false

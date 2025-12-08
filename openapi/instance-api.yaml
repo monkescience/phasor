@@ -1,0 +1,64 @@
+openapi: "3.1.1"
+info:
+  version: 0.1.0
+  title: Instance API
+servers:
+  - url: https://api.example.com
+    description: Production
+  - url: https://staging.api.example.com
+    description: Staging
+
+paths:
+  /instance/info:
+    get:
+      operationId: get_instance_info
+      summary: Get instance information
+      description: Returns information about the current instance
+      responses:
+        "200":
+          description: Instance information successfully returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/instance_info_response"
+
+components:
+  schemas:
+    instance_info_response:
+      type: object
+      additionalProperties: false
+      properties:
+        version:
+          type: string
+          description: Application version
+          examples:
+            - "1.0.0"
+        hostname:
+          type: string
+          format: hostname
+          description: Instance hostname
+          examples:
+            - "server-01.example.com"
+        uptime:
+          type: string
+          format: duration
+          description: Human-readable process uptime
+          examples:
+            - "72h15m33s"
+        go_version:
+          type: string
+          description: Go runtime version
+          examples:
+            - "go1.21.0"
+        timestamp:
+          type: string
+          format: date-time
+          description: Current server timestamp
+          examples:
+            - "2025-01-15T12:34:56Z"
+      required:
+        - version
+        - hostname
+        - uptime
+        - go_version
+        - timestamp

@@ -1,0 +1,33 @@
+name: reference-service-go
+
+replicaCount: 1
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 128Mi
+  limits:
+    memory: 128Mi
+
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 3
+
+env:
+  region: ""
+  environment: ""
+
+config:
+  log_config:
+    level: "info"
+    format: "json"
+    add_source: false
+  tile_colors:
+    - "#667eea"
+    - "#f093fb"
+    - "#4facfe"
+    - "#43e97b"
+    - "#fa709a"
+    - "#feca57"
+    - "#ff6348"
+    - "#1dd1a1"

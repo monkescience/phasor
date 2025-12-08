@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instance Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --card-bg: #ffffff;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --text-tertiary: #80868b;
+            --border-color: #dadce0;
+            --border-light: #e8eaed;
+            --google-blue: #1a73e8;
+            --google-blue-hover: #1765cc;
+            --google-blue-light: #e8f0fe;
+            --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+            --shadow-md: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
+            --divider-color: #e8eaed;
+        }
+
+        [data-theme="dark"] {
+            --bg-main: #202124;
+            --bg-secondary: #292a2d;
+            --card-bg: #292a2d;
+            --text-primary: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --text-tertiary: #80868b;
+            --border-color: #3c4043;
+            --border-light: #3c4043;
+            --google-blue: #8ab4f8;
+            --google-blue-hover: #aecbfa;
+            --google-blue-light: #1e3a5f;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+            --shadow-md: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15);
+            --divider-color: #3c4043;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Google Sans', 'Roboto', Arial, sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            padding: 0;
+            transition: background 0.2s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 24px;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border-light);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header h1 {
+            color: var(--text-primary);
+            font-size: 28px;
+            font-weight: 400;
+            letter-spacing: 0;
+            transition: color 0.2s ease;
+        }
+
+        .theme-toggle {
+            padding: 8px 16px;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            height: 36px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--google-blue-light);
+            border-color: var(--google-blue);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .controls label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 14px;
+            transition: color 0.2s ease;
+        }
+
+        .controls input[type="number"] {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            width: 80px;
+            transition: all 0.2s;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            height: 36px;
+        }
+
+        .controls input[type="number"]:hover {
+            border-color: var(--text-secondary);
+        }
+
+        .controls input[type="number"]:focus {
+            outline: none;
+            border-color: var(--google-blue);
+            border-width: 2px;
+            padding: 7px 11px;
+        }
+
+        .controls button {
+            padding: 0 24px;
+            background: var(--google-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            height: 36px;
+            letter-spacing: 0.25px;
+        }
+
+        .controls button:hover {
+            background: var(--google-blue-hover);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .controls button:active {
+            background: var(--google-blue-hover);
+            box-shadow: none;
+        }
+
+        .controls button:disabled {
+            background: var(--border-color);
+            color: var(--text-tertiary);
+            cursor: not-allowed;
+        }
+
+        .tiles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .tile {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+            transition: box-shadow 0.2s, background 0.2s ease;
+            border: 1px solid var(--border-light);
+        }
+
+        .tile:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .tile h3 {
+            margin-bottom: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--divider-color);
+            padding-bottom: 12px;
+            transition: border-color 0.2s ease;
+        }
+
+        .tile-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 13px;
+            min-width: 90px;
+            transition: color 0.2s ease;
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            text-align: right;
+            word-break: break-word;
+            flex: 1;
+            font-size: 13px;
+            transition: color 0.2s ease;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            grid-column: 1 / -1;
+        }
+
+        .htmx-indicator {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--google-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .tiles-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Dark mode toggle functionality
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const button = document.getElementById('theme-toggle');
+            if (button) {
+                button.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+            }
+        }
+
+        // Initialize theme on page load
+        initTheme();
+    </script>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1>Instance Dashboard</h1>
+                <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()">
+                    🌙 Dark Mode
+                </button>
+            </div>
+            <div class="controls">
+                <label for="tileCount">Number of tiles:</label>
+                <input type="number" id="tileCount" name="count" value="{{.Count}}" min="1" max="20">
+                <button
+                    hx-get="/tiles"
+                    hx-target="#tiles-container"
+                    hx-include="#tileCount"
+                    hx-indicator=".htmx-indicator">
+                    Update
+                </button>
+                <span class="htmx-indicator" style="display: none;"></span>
+            </div>
+        </div>
+
+        <div id="tiles-container"
+             class="tiles-container"
+             hx-get="/tiles?count={{.Count}}"
+             hx-trigger="load">
+            <div class="loading">Loading tiles...</div>
+        </div>
+    </div>
+</body>
+</html>
