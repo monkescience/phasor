@@ -17,13 +17,15 @@ func TestFullStackFlow(t *testing.T) {
 	t.Run("frontend fetches tiles from backend", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a full stack with frontend and backend servers
 		backend := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("2.0.0"),
 		)
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 			frontendserver.WithTileColors([]string{"#667eea", "#f093fb", "#4facfe"}),
@@ -31,10 +33,10 @@ func TestFullStackFlow(t *testing.T) {
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles from frontend
 		resp, err := http.Get(frontend.URL + "/tiles?count=3")
 
-		// Then
+		// THEN: response contains tiles with backend version
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -49,14 +51,16 @@ func TestFullStackFlow(t *testing.T) {
 	t.Run("same version always gets same color", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a frontend with multiple configured colors
 		backend := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("1.2.3"),
 		)
 		defer backend.Close()
 
 		colors := []string{"#667eea", "#f093fb", "#4facfe", "#43e97b"}
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 			frontendserver.WithTileColors(colors),
@@ -64,7 +68,7 @@ func TestFullStackFlow(t *testing.T) {
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles twice
 		resp1, err := http.Get(frontend.URL + "/tiles?count=1")
 		testastic.NoError(t, err)
 		body1 := readBody(t, resp1)
@@ -75,16 +79,18 @@ func TestFullStackFlow(t *testing.T) {
 		body2 := readBody(t, resp2)
 		resp2.Body.Close()
 
-		// Then - check color consistency (uptime changes between requests, so we check color only)
+		// THEN: same version produces same color in both responses
 		var color1, color2 string
 		for _, color := range colors {
 			if strings.Contains(body1, color) {
 				color1 = color
 			}
+
 			if strings.Contains(body2, color) {
 				color2 = color
 			}
 		}
+
 		testastic.NotEmpty(t, color1)
 		testastic.Equal(t, color1, color2)
 	})
@@ -92,14 +98,16 @@ func TestFullStackFlow(t *testing.T) {
 	t.Run("color is derived from configured colors", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a frontend with custom color palette
 		backend := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("test-version"),
 		)
 		defer backend.Close()
 
 		customColors := []string{"#ff0000", "#00ff00", "#0000ff"}
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 			frontendserver.WithTileColors(customColors),
@@ -107,21 +115,24 @@ func TestFullStackFlow(t *testing.T) {
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting a tile
 		resp, err := http.Get(frontend.URL + "/tiles?count=1")
 
-		// Then
+		// THEN: tile uses one of the configured colors
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 
 		body := readBody(t, resp)
 		hasConfiguredColor := false
+
 		for _, color := range customColors {
 			if strings.Contains(body, color) {
 				hasConfiguredColor = true
+
 				break
 			}
 		}
+
 		testastic.True(t, hasConfiguredColor)
 	})
 }

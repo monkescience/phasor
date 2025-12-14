@@ -16,16 +16,17 @@ func TestBackendInstanceAPI(t *testing.T) {
 	t.Run("returns instance info with version", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a backend server with version 1.2.3
 		server := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("1.2.3"),
 		)
 		defer server.Close()
 
-		// When
+		// WHEN: requesting instance info
 		resp, err := http.Get(server.URL + "/instance/info")
 
-		// Then
+		// THEN: response contains version and instance details
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -44,13 +45,14 @@ func TestBackendInstanceAPI(t *testing.T) {
 	t.Run("returns consistent hostname across requests", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a backend server
 		server := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("1.0.0"),
 		)
 		defer server.Close()
 
-		// When
+		// WHEN: requesting instance info twice
 		resp1, err := http.Get(server.URL + "/instance/info")
 		testastic.NoError(t, err)
 		var info1 map[string]any
@@ -63,21 +65,21 @@ func TestBackendInstanceAPI(t *testing.T) {
 		json.NewDecoder(resp2.Body).Decode(&info2)
 		resp2.Body.Close()
 
-		// Then
+		// THEN: hostname is the same in both responses
 		testastic.Equal(t, info1["hostname"], info2["hostname"])
 	})
 
 	t.Run("health live endpoint responds OK", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
-		server := backendserver.NewTestServer()
+		// GIVEN: a backend server
+		server := backendserver.NewTestServer(backendserver.WithTestLogger(t))
 		defer server.Close()
 
-		// When
+		// WHEN: requesting the live health endpoint
 		resp, err := http.Get(server.URL + "/health/live")
 
-		// Then
+		// THEN: response status is OK
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -86,14 +88,14 @@ func TestBackendInstanceAPI(t *testing.T) {
 	t.Run("health ready endpoint responds OK", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
-		server := backendserver.NewTestServer()
+		// GIVEN: a backend server
+		server := backendserver.NewTestServer(backendserver.WithTestLogger(t))
 		defer server.Close()
 
-		// When
+		// WHEN: requesting the ready health endpoint
 		resp, err := http.Get(server.URL + "/health/ready")
 
-		// Then
+		// THEN: response status is OK
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)

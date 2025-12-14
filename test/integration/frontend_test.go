@@ -18,23 +18,25 @@ func TestFrontendHandler(t *testing.T) {
 	t.Run("index page returns HTML", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a frontend server connected to a backend
 		backend := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("1.0.0"),
 		)
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting the index page
 		resp, err := http.Get(frontend.URL + "/")
 
-		// Then
+		// THEN: response contains HTML with dashboard content
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -47,21 +49,22 @@ func TestFrontendHandler(t *testing.T) {
 	t.Run("health endpoint responds OK", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
-		backend := backendserver.NewTestServer()
+		// GIVEN: a frontend server
+		backend := backendserver.NewTestServer(backendserver.WithTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting the health endpoint
 		resp, err := http.Get(frontend.URL + "/health/live")
 
-		// Then
+		// THEN: response status is OK
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -74,13 +77,15 @@ func TestFrontendTiles(t *testing.T) {
 	t.Run("tiles endpoint fetches from backend", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a frontend server with configured tile colors
 		backend := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("2.0.0"),
 		)
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 			frontendserver.WithTileColors([]string{"#667eea", "#f093fb"}),
@@ -88,10 +93,10 @@ func TestFrontendTiles(t *testing.T) {
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles with count=2
 		resp, err := http.Get(frontend.URL + "/tiles?count=2")
 
-		// Then
+		// THEN: response contains two tiles with backend version
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -106,23 +111,25 @@ func TestFrontendTiles(t *testing.T) {
 	t.Run("tile count parameter is respected", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
+		// GIVEN: a frontend server
 		backend := backendserver.NewTestServer(
+			backendserver.WithTestLogger(t),
 			backendserver.WithVersion("1.0.0"),
 		)
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles with count=5
 		resp, err := http.Get(frontend.URL + "/tiles?count=5")
 
-		// Then
+		// THEN: response contains exactly 5 tiles
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -138,21 +145,22 @@ func TestFrontendTiles(t *testing.T) {
 	t.Run("invalid count uses default of 3", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
-		backend := backendserver.NewTestServer()
+		// GIVEN: a frontend server
+		backend := backendserver.NewTestServer(backendserver.WithTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles with invalid count parameter
 		resp, err := http.Get(frontend.URL + "/tiles?count=invalid")
 
-		// Then
+		// THEN: response contains default 3 tiles
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -164,21 +172,22 @@ func TestFrontendTiles(t *testing.T) {
 	t.Run("count is limited to maximum of 20", func(t *testing.T) {
 		t.Parallel()
 
-		// Given
-		backend := backendserver.NewTestServer()
+		// GIVEN: a frontend server
+		backend := backendserver.NewTestServer(backendserver.WithTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles with count exceeding maximum
 		resp, err := http.Get(frontend.URL + "/tiles?count=100")
 
-		// Then
+		// THEN: response is limited to maximum of 20 tiles
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
@@ -190,31 +199,35 @@ func TestFrontendTiles(t *testing.T) {
 	t.Run("handles backend failure gracefully", func(t *testing.T) {
 		t.Parallel()
 
-		// Given - no backend server running
+		// GIVEN: a frontend server with unreachable backend
 		frontend, err := frontendserver.NewTestServer(
+			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL("http://localhost:59999/instance/info"),
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
 		defer frontend.Close()
 
-		// When
+		// WHEN: requesting tiles
 		resp, err := http.Get(frontend.URL + "/tiles?count=1")
 
-		// Then
+		// THEN: response shows error state gracefully
 		testastic.NoError(t, err)
 		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 
 		body := readBody(t, resp)
-		testastic.Contains(t, body, "error") // Error shown in version field
+		testastic.Contains(t, body, "error")
 	})
 }
 
 func readBody(t *testing.T, resp *http.Response) string {
 	t.Helper()
+
 	buf := new(strings.Builder)
+
 	_, err := io.Copy(buf, resp.Body)
 	testastic.NoError(t, err)
+
 	return buf.String()
 }

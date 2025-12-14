@@ -3,11 +3,7 @@ package server
 
 import (
 	"net/http/httptest"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/monkescience/vital"
-
-	instanceapi "phasor/backend/internal/instance"
+	"phasor/backend/internal/app"
 )
 
 // NewTestServer creates a fully configured test server with the same middleware
@@ -18,23 +14,11 @@ func NewTestServer(opts ...Option) *httptest.Server {
 		opt(&options)
 	}
 
-	router := chi.NewRouter()
-
-	// Apply same middleware as production
-	router.Use(vital.Recovery(options.Logger))
-	router.Use(vital.RequestLogger(options.Logger))
-	router.Use(vital.TraceContext())
-
-	// Wire up handlers exactly like production
-	instanceHandler := instanceapi.NewInstanceHandler(options.Version)
-	instanceapi.HandlerFromMux(instanceHandler, router)
-
-	// Health endpoints
-	healthHandler := vital.NewHealthHandler(
-		vital.WithVersion(options.Version),
-		vital.WithEnvironment("test"),
+	router := app.SetupRouter(
+		app.WithVersion(options.Version),
+		app.WithEnvironment("test"),
+		app.WithLogger(options.Logger),
 	)
-	router.Mount("/health", healthHandler)
 
 	return httptest.NewServer(router)
 }
