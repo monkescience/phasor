@@ -228,11 +228,7 @@ func (h *FrontendHandler) getColorForVersion(version string) string {
 		return defaultFallbackColor
 	}
 
-	hashValue := int64(hasher.Sum32())
-	if hashValue > maxTileColorIndex {
-		hashValue = maxTileColorIndex
-	}
-
+	hashValue := min(int64(hasher.Sum32()), maxTileColorIndex)
 	index := hashValue % int64(len(h.tileColors))
 
 	return h.tileColors[index]
@@ -251,11 +247,7 @@ func (h *FrontendHandler) getColorForHostname(hostname string) string {
 		return defaultFallbackColor
 	}
 
-	hashValue := int64(hasher.Sum32())
-	if hashValue > maxTileColorIndex {
-		hashValue = maxTileColorIndex
-	}
-
+	hashValue := min(int64(hasher.Sum32()), maxTileColorIndex)
 	index := hashValue % int64(len(h.tileColors))
 
 	return h.tileColors[index]

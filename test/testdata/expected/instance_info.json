@@ -1,0 +1,7 @@
+{
+  "version": "{{anyString}}",
+  "hostname": "{{anyString}}",
+  "go_version": "{{anyString}}",
+  "uptime": "{{anyString}}",
+  "timestamp": "{{anyString}}"
+}

@@ -5,6 +5,7 @@ go 1.25.5
 require (
 	github.com/getkin/kin-openapi v0.133.0
 	github.com/go-chi/chi/v5 v5.2.3
+	github.com/monkescience/testastic v0.0.0-20251214144410-f0bc01339ad9
 	github.com/monkescience/vital v0.0.0-20251130212730-4d004d00a5c3
 	github.com/oapi-codegen/oapi-codegen/v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.1
@@ -28,6 +29,8 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0-rc.3 // indirect
 	golang.org/x/mod v0.30.0 // indirect
 	golang.org/x/sync v0.18.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/term v0.38.0 // indirect
 	golang.org/x/text v0.31.0 // indirect
 	golang.org/x/tools v0.39.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect

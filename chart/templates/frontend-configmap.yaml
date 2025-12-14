@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "phasor.frontend.fullname" . }}
+  labels:
+    {{- include "phasor.frontend.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    {{- if .Values.dapr.enabled }}
+    backend_url: "http://localhost:3500/v1.0/invoke/{{ .Values.dapr.backend.appId }}/method/instance/info"
+    {{- else }}
+    backend_url: "http://{{ include "phasor.backend.fullname" . }}/instance/info"
+    {{- end }}
+    log_config:
+      level: {{ .Values.frontend.config.log_config.level | default "info" | quote }}
+      format: {{ .Values.frontend.config.log_config.format | default "json" | quote }}
+      add_source: {{ .Values.frontend.config.log_config.add_source | default false }}
+    tile_colors:
+      {{- range .Values.frontend.config.tile_colors }}
+      - {{ . | quote }}
+      {{- end }}

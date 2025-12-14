@@ -1,0 +1,62 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Run backend tests with coverage
+        run: |
+          cd backend
+          go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Run frontend tests with coverage
+        run: |
+          cd frontend
+          go test -v -race -coverprofile=coverage.out ./...
+
+      - name: Upload backend coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: backend/coverage.out
+          flags: backend
+          fail_ci_if_error: false
+
+      - name: Upload frontend coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: frontend/coverage.out
+          flags: frontend
+          fail_ci_if_error: false
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: golangci-lint backend
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: backend
+
+      - name: golangci-lint frontend
+        uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: frontend

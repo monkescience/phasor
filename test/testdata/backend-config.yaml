@@ -1,0 +1,4 @@
+log_config:
+  level: "info"
+  format: "json"
+  add_source: false

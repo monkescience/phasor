@@ -1,0 +1,12 @@
+{{range .Instances}}
+<div class="tile" style="border-left: 6px solid {{.Color}};">
+    <h3>Instance #{{.Index}}</h3>
+    {{if .Error}}
+    <div class="error">failed to fetch: {{.Error}}</div>
+    {{else}}
+    <div>Version: {{.Info.Version}}</div>
+    <div>Hostname: {{.Info.Hostname}}</div>
+    <div>Uptime: {{.Info.Uptime}}</div>
+    {{end}}
+</div>
+{{end}}

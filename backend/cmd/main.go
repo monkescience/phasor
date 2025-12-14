@@ -4,8 +4,8 @@ import (
 	"flag"
 	"log"
 	"log/slog"
-	"reference-service-go/backend/internal/config"
-	instanceapi "reference-service-go/backend/internal/instance"
+	"phasor/backend/internal/config"
+	instanceapi "phasor/backend/internal/instance"
 	"time"
 
 	"github.com/go-chi/chi/v5"

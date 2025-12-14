@@ -6,8 +6,8 @@ import (
 	"log"
 	"log/slog"
 	"path/filepath"
-	"reference-service-go/frontend/internal/config"
-	"reference-service-go/frontend/internal/frontend"
+	"phasor/frontend/internal/config"
+	"phasor/frontend/internal/frontend"
 	"time"
 
 	"github.com/go-chi/chi/v5"
