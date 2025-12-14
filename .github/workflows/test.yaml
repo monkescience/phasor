@@ -17,28 +17,26 @@ jobs:
         with:
           go-version: '1.23'
 
-      - name: Run backend tests with coverage
+      - name: Check no unit tests in internal packages
         run: |
-          cd backend
-          go test -v -race -coverprofile=coverage.out ./...
+          if find backend/internal frontend/internal -name '*_test.go' 2>/dev/null | grep -q .; then
+            echo "ERROR: Unit tests found in internal/ packages. Move to test/integration/"
+            find backend/internal frontend/internal -name '*_test.go'
+            exit 1
+          fi
 
-      - name: Run frontend tests with coverage
+      - name: Run integration tests with coverage
         run: |
-          cd frontend
-          go test -v -race -coverprofile=coverage.out ./...
+          cd test
+          go test -v -race \
+            -coverprofile=coverage.out \
+            -coverpkg=phasor/backend/...,phasor/frontend/... \
+            ./integration/...
 
-      - name: Upload backend coverage to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          file: backend/coverage.out
-          flags: backend
-          fail_ci_if_error: false
-
-      - name: Upload frontend coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: frontend/coverage.out
-          flags: frontend
+          file: test/coverage.out
           fail_ci_if_error: false
 
   lint:
