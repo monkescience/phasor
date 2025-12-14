@@ -1,5 +1,6 @@
 APP_NAME := phasor
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+GO_MODULES := backend frontend test
 SERVICES := backend frontend
 
 .PHONY: build test lint fmt clean docker-build docker-up docker-down helm-lint mod-tidy generate help
@@ -13,13 +14,13 @@ build: ## Build all binaries
 	done
 
 test: ## Run tests
-	@for svc in $(SERVICES); do cd $$svc && go test -race ./... && cd ..; done
+	@cd test && go test -race ./...
 
 lint: ## Run linter
-	@for svc in $(SERVICES); do cd $$svc && golangci-lint run --timeout=5m && cd ..; done
+	golangci-lint run --timeout=5m $(foreach mod,$(GO_MODULES),./$(mod)/...)
 
 fmt: ## Format code
-	@for svc in $(SERVICES); do cd $$svc && golangci-lint fmt && cd ..; done
+	golangci-lint fmt $(foreach mod,$(GO_MODULES),./$(mod)/...)
 
 clean: ## Clean build artifacts
 	rm -rf build
@@ -39,7 +40,7 @@ helm-lint: ## Lint Helm chart
 	helm lint chart
 
 mod-tidy: ## Tidy Go modules
-	@for svc in $(SERVICES); do cd $$svc && go mod tidy && cd ..; done
+	@for mod in $(GO_MODULES); do cd $$mod && go mod tidy && cd ..; done
 
 generate: ## Generate OpenAPI code
 	cd backend && go generate ./...

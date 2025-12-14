@@ -1,13 +1,13 @@
-package integration
+package integration_test
 
 import (
 	"encoding/json"
 	"net/http"
 	"testing"
 
-	"github.com/monkescience/testastic"
-
 	backendserver "phasor/backend/pkg/server"
+
+	"github.com/monkescience/testastic"
 )
 
 func TestBackendInstanceAPI(t *testing.T) {
@@ -24,22 +24,13 @@ func TestBackendInstanceAPI(t *testing.T) {
 		defer server.Close()
 
 		// WHEN: requesting instance info
-		resp, err := http.Get(server.URL + "/instance/info")
+		resp := httpGet(t, server.URL+"/instance/info")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		// THEN: response contains version and instance details
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
+		// THEN: response matches expected JSON structure
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 		testastic.Equal(t, "application/json", resp.Header.Get("Content-Type"))
-
-		var info map[string]any
-		err = json.NewDecoder(resp.Body).Decode(&info)
-		testastic.NoError(t, err)
-		testastic.Equal(t, "1.2.3", info["version"])
-		testastic.NotEmpty(t, info["hostname"])
-		testastic.NotEmpty(t, info["go_version"])
-		testastic.NotEmpty(t, info["uptime"])
-		testastic.NotEmpty(t, info["timestamp"])
+		testastic.AssertJSON(t, testdataPath("backend_instance_info", "response.json"), resp.Body)
 	})
 
 	t.Run("returns consistent hostname across requests", func(t *testing.T) {
@@ -53,17 +44,21 @@ func TestBackendInstanceAPI(t *testing.T) {
 		defer server.Close()
 
 		// WHEN: requesting instance info twice
-		resp1, err := http.Get(server.URL + "/instance/info")
-		testastic.NoError(t, err)
-		var info1 map[string]any
-		json.NewDecoder(resp1.Body).Decode(&info1)
-		resp1.Body.Close()
+		resp1 := httpGet(t, server.URL+"/instance/info")
 
-		resp2, err := http.Get(server.URL + "/instance/info")
+		var info1 map[string]any
+
+		err := json.NewDecoder(resp1.Body).Decode(&info1)
 		testastic.NoError(t, err)
+		resp1.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
+
+		resp2 := httpGet(t, server.URL+"/instance/info")
+
 		var info2 map[string]any
-		json.NewDecoder(resp2.Body).Decode(&info2)
-		resp2.Body.Close()
+
+		err = json.NewDecoder(resp2.Body).Decode(&info2)
+		testastic.NoError(t, err)
+		resp2.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: hostname is the same in both responses
 		testastic.Equal(t, info1["hostname"], info2["hostname"])
@@ -77,11 +72,10 @@ func TestBackendInstanceAPI(t *testing.T) {
 		defer server.Close()
 
 		// WHEN: requesting the live health endpoint
-		resp, err := http.Get(server.URL + "/health/live")
+		resp := httpGet(t, server.URL+"/health/live")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response status is OK
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 
@@ -93,11 +87,10 @@ func TestBackendInstanceAPI(t *testing.T) {
 		defer server.Close()
 
 		// WHEN: requesting the ready health endpoint
-		resp, err := http.Get(server.URL + "/health/ready")
+		resp := httpGet(t, server.URL+"/health/ready")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response status is OK
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 }

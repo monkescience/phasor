@@ -1,14 +1,14 @@
-package integration
+package integration_test
 
 import (
 	"net/http"
 	"strings"
 	"testing"
 
-	"github.com/monkescience/testastic"
-
 	backendserver "phasor/backend/pkg/server"
 	frontendserver "phasor/frontend/pkg/server"
+
+	"github.com/monkescience/testastic"
 )
 
 func TestFullStackFlow(t *testing.T) {
@@ -31,14 +31,14 @@ func TestFullStackFlow(t *testing.T) {
 			frontendserver.WithTileColors([]string{"#667eea", "#f093fb", "#4facfe"}),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles from frontend
-		resp, err := http.Get(frontend.URL + "/tiles?count=3")
+		resp := httpGet(t, frontend.URL+"/tiles?count=3")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response contains tiles with backend version
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 
 		body := readBody(t, resp)
@@ -59,6 +59,7 @@ func TestFullStackFlow(t *testing.T) {
 		defer backend.Close()
 
 		colors := []string{"#667eea", "#f093fb", "#4facfe", "#43e97b"}
+
 		frontend, err := frontendserver.NewTestServer(
 			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
@@ -66,21 +67,21 @@ func TestFullStackFlow(t *testing.T) {
 			frontendserver.WithTileColors(colors),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles twice
-		resp1, err := http.Get(frontend.URL + "/tiles?count=1")
-		testastic.NoError(t, err)
+		resp1 := httpGet(t, frontend.URL+"/tiles?count=1")
 		body1 := readBody(t, resp1)
-		resp1.Body.Close()
+		resp1.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		resp2, err := http.Get(frontend.URL + "/tiles?count=1")
-		testastic.NoError(t, err)
+		resp2 := httpGet(t, frontend.URL+"/tiles?count=1")
 		body2 := readBody(t, resp2)
-		resp2.Body.Close()
+		resp2.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: same version produces same color in both responses
 		var color1, color2 string
+
 		for _, color := range colors {
 			if strings.Contains(body1, color) {
 				color1 = color
@@ -106,6 +107,7 @@ func TestFullStackFlow(t *testing.T) {
 		defer backend.Close()
 
 		customColors := []string{"#ff0000", "#00ff00", "#0000ff"}
+
 		frontend, err := frontendserver.NewTestServer(
 			frontendserver.WithTestLogger(t),
 			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
@@ -113,14 +115,15 @@ func TestFullStackFlow(t *testing.T) {
 			frontendserver.WithTileColors(customColors),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting a tile
-		resp, err := http.Get(frontend.URL + "/tiles?count=1")
+		resp := httpGet(t, frontend.URL+"/tiles?count=1")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: tile uses one of the configured colors
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
+		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 
 		body := readBody(t, resp)
 		hasConfiguredColor := false

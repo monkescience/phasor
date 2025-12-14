@@ -1,9 +1,0 @@
-backend_url: "http://localhost:8080/instance/info"
-tile_colors:
-  - "#667eea"
-  - "#f093fb"
-  - "#4facfe"
-log_config:
-  level: "info"
-  format: "json"
-  add_source: false

@@ -1,4 +1,4 @@
-package integration
+package integration_test
 
 import (
 	"io"
@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/monkescience/testastic"
-
 	backendserver "phasor/backend/pkg/server"
 	frontendserver "phasor/frontend/pkg/server"
+
+	"github.com/monkescience/testastic"
 )
 
 func TestFrontendHandler(t *testing.T) {
@@ -31,19 +31,16 @@ func TestFrontendHandler(t *testing.T) {
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting the index page
-		resp, err := http.Get(frontend.URL + "/")
+		resp := httpGet(t, frontend.URL+"/")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		// THEN: response contains HTML with dashboard content
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
+		// THEN: response matches expected HTML structure
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-
-		body := readBody(t, resp)
-		testastic.Contains(t, body, "<!DOCTYPE html>")
-		testastic.Contains(t, body, "Instance Dashboard")
+		testastic.AssertHTML(t, testdataPath("frontend_index", "response.html"), resp.Body)
 	})
 
 	t.Run("health endpoint responds OK", func(t *testing.T) {
@@ -59,14 +56,14 @@ func TestFrontendHandler(t *testing.T) {
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting the health endpoint
-		resp, err := http.Get(frontend.URL + "/health/live")
+		resp := httpGet(t, frontend.URL+"/health/live")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response status is OK
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 	})
 }
@@ -91,21 +88,16 @@ func TestFrontendTiles(t *testing.T) {
 			frontendserver.WithTileColors([]string{"#667eea", "#f093fb"}),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles with count=2
-		resp, err := http.Get(frontend.URL + "/tiles?count=2")
+		resp := httpGet(t, frontend.URL+"/tiles?count=2")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		// THEN: response contains two tiles with backend version
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
+		// THEN: response matches expected HTML structure
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-
-		body := readBody(t, resp)
-		testastic.Contains(t, body, "2.0.0")
-		testastic.Contains(t, body, "Instance #1")
-		testastic.Contains(t, body, "Instance #2")
-		testastic.Contains(t, body, "border-left")
+		testastic.AssertHTML(t, testdataPath("frontend_tiles_count_2", "response.html"), resp.Body)
 	})
 
 	t.Run("tile count parameter is respected", func(t *testing.T) {
@@ -124,22 +116,16 @@ func TestFrontendTiles(t *testing.T) {
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles with count=5
-		resp, err := http.Get(frontend.URL + "/tiles?count=5")
+		resp := httpGet(t, frontend.URL+"/tiles?count=5")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		// THEN: response contains exactly 5 tiles
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
+		// THEN: response matches expected HTML structure with 5 tiles
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-
-		body := readBody(t, resp)
-		testastic.Contains(t, body, "Instance #1")
-		testastic.Contains(t, body, "Instance #2")
-		testastic.Contains(t, body, "Instance #3")
-		testastic.Contains(t, body, "Instance #4")
-		testastic.Contains(t, body, "Instance #5")
+		testastic.AssertHTML(t, testdataPath("frontend_tiles_count_5", "response.html"), resp.Body)
 	})
 
 	t.Run("invalid count uses default of 3", func(t *testing.T) {
@@ -155,14 +141,14 @@ func TestFrontendTiles(t *testing.T) {
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles with invalid count parameter
-		resp, err := http.Get(frontend.URL + "/tiles?count=invalid")
+		resp := httpGet(t, frontend.URL+"/tiles?count=invalid")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response contains default 3 tiles
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 
 		body := readBody(t, resp)
@@ -182,14 +168,14 @@ func TestFrontendTiles(t *testing.T) {
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles with count exceeding maximum
-		resp, err := http.Get(frontend.URL + "/tiles?count=100")
+		resp := httpGet(t, frontend.URL+"/tiles?count=100")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response is limited to maximum of 20 tiles
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 
 		body := readBody(t, resp)
@@ -206,18 +192,16 @@ func TestFrontendTiles(t *testing.T) {
 			frontendserver.WithTemplatesPath(templatesPath()),
 		)
 		testastic.NoError(t, err)
+
 		defer frontend.Close()
 
 		// WHEN: requesting tiles
-		resp, err := http.Get(frontend.URL + "/tiles?count=1")
+		resp := httpGet(t, frontend.URL+"/tiles?count=1")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
 		// THEN: response shows error state gracefully
-		testastic.NoError(t, err)
-		defer resp.Body.Close()
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-
-		body := readBody(t, resp)
-		testastic.Contains(t, body, "error")
+		testastic.AssertHTML(t, testdataPath("frontend_tiles_error", "response.html"), resp.Body)
 	})
 }
 

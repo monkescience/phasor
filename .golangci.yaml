@@ -13,6 +13,8 @@ linters:
           yaml: snake
           xml: snake
           bson: snake
+    gomoddirectives:
+      replace-local: true
 
   exclusions:
     rules:
