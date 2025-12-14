@@ -1,33 +1,67 @@
-name: reference-service-go
+# Phasor Helm Chart Values
 
-replicaCount: 1
+nameOverride: ""
+fullnameOverride: ""
 
-resources:
-  requests:
-    cpu: 250m
-    memory: 128Mi
-  limits:
-    memory: 128Mi
+# Backend service configuration
+backend:
+  replicaCount: 3
+  
+  image:
+    repository: ghcr.io/monkescience/phasor-backend
+    pullPolicy: IfNotPresent
+    tag: ""  # Defaults to chart appVersion
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
+  
+  config:
+    log_config:
+      level: "info"
+      format: "json"
+      add_source: false
 
-autoscaling:
-  minReplicas: 1
-  maxReplicas: 3
+# Frontend service configuration
+frontend:
+  replicaCount: 2
+  
+  image:
+    repository: ghcr.io/monkescience/phasor-frontend
+    pullPolicy: IfNotPresent
+    tag: ""  # Defaults to chart appVersion
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
+  
+  config:
+    log_config:
+      level: "info"
+      format: "json"
+      add_source: false
+    tile_colors:
+      - "#667eea"  # Purple-blue
+      - "#f093fb"  # Pink
+      - "#4facfe"  # Light blue
+      - "#43e97b"  # Green
+      - "#fa709a"  # Rose
+      - "#feca57"  # Yellow
+      - "#ff6348"  # Coral
+      - "#1dd1a1"  # Turquoise
 
-env:
-  region: ""
-  environment: ""
-
-config:
-  log_config:
-    level: "info"
-    format: "json"
-    add_source: false
-  tile_colors:
-    - "#667eea"
-    - "#f093fb"
-    - "#4facfe"
-    - "#43e97b"
-    - "#fa709a"
-    - "#feca57"
-    - "#ff6348"
-    - "#1dd1a1"
+# Dapr sidecar configuration
+dapr:
+  enabled: false
+  config: "daprconfig"
+  logLevel: "info"
+  backend:
+    appId: "phasor-backend"
+  frontend:
+    appId: "phasor-frontend"

@@ -1,6 +1,8 @@
 apiVersion: v2
-name: reference-service-go
+name: phasor
+description: A Helm chart for Phasor microservices (backend and frontend)
 
 type: application
-version: 0.0.0
-appVersion: "0.0.0"
+
+version: 0.1.0
+appVersion: "0.1.0"

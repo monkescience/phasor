@@ -1,4 +1,4 @@
-# Frontend Service Configuration for Docker
+# Frontend Service Configuration
 
 # Backend service URL (via Traefik)
 backend_url: "http://traefik:80/instance/info"
