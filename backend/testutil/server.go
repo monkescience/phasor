@@ -10,13 +10,14 @@ import (
 
 // NewTestServer creates a fully configured test server with the same middleware
 // and routing as production. Returns an httptest.Server ready for integration tests.
+// Uses a fixed hostname "test-host" for deterministic test output.
 func NewTestServer(version string, logger *slog.Logger) *httptest.Server {
 	cfg := &config.Config{
 		Version:     version,
 		Environment: "test",
 	}
 
-	router := app.SetupRouter(cfg, logger)
+	router := app.SetupRouterWithHostname(cfg, logger, func() string { return "test-host" })
 
 	return httptest.NewServer(router)
 }
