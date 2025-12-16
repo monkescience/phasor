@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -9,6 +10,7 @@ import (
 	"html/template"
 	"net/http"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"time"
 )
@@ -85,10 +87,8 @@ func NewFrontendHandler(
 
 	return &FrontendHandler{
 		templates: tmpl,
-		//nolint:exhaustruct // Other http.Client fields use sensible defaults
 		instanceClient: &http.Client{
 			Timeout: httpClientTimeout,
-			//nolint:exhaustruct // Other http.Transport fields use sensible defaults
 			Transport: &http.Transport{
 				MaxIdleConns:        transportMaxIdleConns,
 				IdleConnTimeout:     transportIdleConnTimeout,
@@ -126,15 +126,13 @@ func (h *FrontendHandler) TilesHandler(writer http.ResponseWriter, req *http.Req
 	count := defaultTileCount
 
 	if countStr != "" {
-		//nolint:noinlineerr // Inline error check is clearer for optional parameter parsing
-		if parsedCount, err := strconv.Atoi(countStr); err == nil && parsedCount > 0 &&
-			parsedCount <= maxTileCount {
+		parsedCount, err := strconv.Atoi(countStr)
+		if err == nil && parsedCount > 0 && parsedCount <= maxTileCount {
 			count = parsedCount
 		}
 	}
 
 	instances := make([]InstanceTileData, count)
-	//nolint:varnamelen // 'i' is idiomatic for loop index
 	for i := range count {
 		info, err := h.fetchInstanceInfo(req.Context())
 		if err != nil {
@@ -153,6 +151,19 @@ func (h *FrontendHandler) TilesHandler(writer http.ResponseWriter, req *http.Req
 			Color:         h.getColorForVersion(info.Version),
 			HostnameColor: h.getColorForHostname(info.Hostname),
 		}
+	}
+
+	// Sort by Version (descending), then Hostname (descending)
+	slices.SortFunc(instances, func(a, b InstanceTileData) int {
+		if result := cmp.Compare(b.Info.Version, a.Info.Version); result != 0 {
+			return result
+		}
+
+		return cmp.Compare(b.Info.Hostname, a.Info.Hostname)
+	})
+
+	for i := range instances {
+		instances[i].Index = i + 1
 	}
 
 	data := TilesData{
@@ -190,9 +201,9 @@ func (h *FrontendHandler) fetchInstanceInfo(
 		)
 	}
 
-	//nolint:noinlineerr,wsl // Defer close pattern is idiomatic for resource cleanup
 	defer func() {
-		if closeErr := resp.Body.Close(); closeErr != nil {
+		closeErr := resp.Body.Close()
+		if closeErr != nil {
 			err = errors.Join(err, fmt.Errorf("failed to close response body: %w", closeErr))
 		}
 	}()
@@ -223,8 +234,9 @@ func (h *FrontendHandler) getColorForVersion(version string) string {
 	}
 
 	hasher := fnv.New32a()
-	//nolint:noinlineerr // Hash.Write error is extremely unlikely and non-critical
-	if _, err := hasher.Write([]byte(version)); err != nil {
+
+	_, err := hasher.Write([]byte(version))
+	if err != nil {
 		return defaultFallbackColor
 	}
 
@@ -242,8 +254,9 @@ func (h *FrontendHandler) getColorForHostname(hostname string) string {
 	}
 
 	hasher := fnv.New32a()
-	//nolint:noinlineerr // Hash.Write error is extremely unlikely and non-critical
-	if _, err := hasher.Write([]byte(hostname)); err != nil {
+
+	_, err := hasher.Write([]byte(hostname))
+	if err != nil {
 		return defaultFallbackColor
 	}
 

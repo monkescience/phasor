@@ -4,12 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
 
-// ErrVersionRequired is returned when the VERSION environment variable is not set.
-var ErrVersionRequired = errors.New("VERSION environment variable is required")
+var (
+	// ErrVersionRequired is returned when the VERSION environment variable is not set.
+	ErrVersionRequired = errors.New("VERSION environment variable is required")
+	// ErrConfigPathNotAbsolute is returned when the config file path is not absolute.
+	ErrConfigPathNotAbsolute = errors.New("config file path must be absolute")
+)
 
 // Config holds the backend application configuration.
 type Config struct {
@@ -24,15 +29,19 @@ type Config struct {
 // Load reads configuration from the specified YAML file and environment variables.
 // The VERSION environment variable is required and must be set; it cannot be configured via the config file.
 func Load(path string) (*Config, error) {
-	//nolint:gosec // Config file path is expected to be provided by trusted deployment configuration
-	configFile, err := os.Open(path)
+	cleanPath := filepath.Clean(path)
+	if !filepath.IsAbs(cleanPath) {
+		return nil, fmt.Errorf("%w: %s", ErrConfigPathNotAbsolute, path)
+	}
+
+	configFile, err := os.Open(cleanPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file: %w", err)
 	}
 
-	//nolint:noinlineerr,wsl // Defer close pattern is idiomatic for resource cleanup
 	defer func() {
-		if closeErr := configFile.Close(); closeErr != nil {
+		closeErr := configFile.Close()
+		if closeErr != nil {
 			err = errors.Join(err, fmt.Errorf("failed to close config file: %w", closeErr))
 		}
 	}()

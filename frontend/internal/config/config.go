@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"gopkg.in/yaml.v3"
 )
@@ -13,6 +14,8 @@ var (
 	ErrTileColorsRequired = errors.New("tile_colors must be configured in the config file")
 	// ErrBackendURLRequired is returned when backend_url is not configured.
 	ErrBackendURLRequired = errors.New("backend_url must be configured in the config file")
+	// ErrConfigPathNotAbsolute is returned when the config file path is not absolute.
+	ErrConfigPathNotAbsolute = errors.New("config file path must be absolute")
 )
 
 // Config holds the frontend application configuration.
@@ -28,15 +31,19 @@ type Config struct {
 
 // Load reads configuration from the specified YAML file.
 func Load(path string) (*Config, error) {
-	//nolint:gosec // Config file path is expected to be provided by trusted deployment configuration
-	configFile, err := os.Open(path)
+	cleanPath := filepath.Clean(path)
+	if !filepath.IsAbs(cleanPath) {
+		return nil, fmt.Errorf("%w: %s", ErrConfigPathNotAbsolute, path)
+	}
+
+	configFile, err := os.Open(cleanPath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open config file: %w", err)
 	}
 
-	//nolint:noinlineerr,wsl // Defer close pattern is idiomatic for resource cleanup
 	defer func() {
-		if closeErr := configFile.Close(); closeErr != nil {
+		closeErr := configFile.Close()
+		if closeErr != nil {
 			err = errors.Join(err, fmt.Errorf("failed to close config file: %w", closeErr))
 		}
 	}()

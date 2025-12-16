@@ -1,30 +1,22 @@
-# Traefik Static Configuration
-
-# API and Dashboard
 api:
   dashboard: true
   insecure: true
 
-# Entry Points
 entryPoints:
   web:
     address: ":80"
   traefik:
     address: ":8080"
 
-# Providers
 providers:
   file:
     filename: /etc/traefik/dynamic.yaml
     watch: true
 
-# Enable ping
 ping:
   entryPoint: traefik
 
-# Logging
 log:
   level: INFO
 
-# Access logs for debugging
 accessLog: {}
