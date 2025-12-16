@@ -21,7 +21,6 @@ const (
 	httpClientTimeout        = 5 * time.Second
 	defaultFallbackColor     = "#667eea"
 	httpRequestTimeout       = 3 * time.Second
-	maxTileColorIndex        = int64(1<<31 - 1) // Max safe int32 value
 	transportMaxIdleConns    = 10
 	transportIdleConnTimeout = 30 * time.Second
 	transportMaxIdlePerHost  = 2
@@ -240,8 +239,7 @@ func (h *FrontendHandler) getColorForVersion(version string) string {
 		return defaultFallbackColor
 	}
 
-	hashValue := min(int64(hasher.Sum32()), maxTileColorIndex)
-	index := hashValue % int64(len(h.tileColors))
+	index := int(hasher.Sum32()) % len(h.tileColors)
 
 	return h.tileColors[index]
 }
@@ -260,8 +258,7 @@ func (h *FrontendHandler) getColorForHostname(hostname string) string {
 		return defaultFallbackColor
 	}
 
-	hashValue := min(int64(hasher.Sum32()), maxTileColorIndex)
-	index := hashValue % int64(len(h.tileColors))
+	index := int(hasher.Sum32()) % len(h.tileColors)
 
 	return h.tileColors[index]
 }
