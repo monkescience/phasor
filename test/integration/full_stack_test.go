@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	backendserver "phasor/backend/pkg/server"
-	frontendserver "phasor/frontend/pkg/server"
+	backendserver "phasor/backend/testutil"
+	frontendserver "phasor/frontend/testutil"
 
 	"github.com/monkescience/testastic"
 )
@@ -18,10 +18,7 @@ func TestFullStackFlow(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a full stack with frontend and backend servers
-		backend := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("2.0.0"),
-		)
+		backend := backendserver.NewTestServer("2.0.0", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
@@ -50,10 +47,7 @@ func TestFullStackFlow(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend with multiple configured colors
-		backend := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("1.2.3"),
-		)
+		backend := backendserver.NewTestServer("1.2.3", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		tileColors := []string{"#667eea", "#f093fb", "#4facfe", "#43e97b"}
@@ -98,10 +92,7 @@ func TestFullStackFlow(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend with custom color palette
-		backend := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("test-version"),
-		)
+		backend := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		tileColors := []string{"#ff0000", "#00ff00", "#0000ff", "#ffff00"}

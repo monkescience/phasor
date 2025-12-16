@@ -1,5 +1,5 @@
-// Package server provides a test server factory for integration testing.
-package server
+// Package testutil provides test utilities for integration testing.
+package testutil
 
 import (
 	"fmt"

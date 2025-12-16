@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
-	backendserver "phasor/backend/pkg/server"
-	frontendserver "phasor/frontend/pkg/server"
+	backendserver "phasor/backend/testutil"
+	frontendserver "phasor/frontend/testutil"
 
 	"github.com/monkescience/testastic"
 )
@@ -21,10 +21,7 @@ func TestFrontendHandler(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server connected to a backend
-		backend := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("1.0.0"),
-		)
+		backend := backendserver.NewTestServer("1.0.0", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
@@ -50,7 +47,7 @@ func TestFrontendHandler(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server
-		backend := backendserver.NewTestServer(backendserver.WithTestLogger(t))
+		backend := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
@@ -79,10 +76,7 @@ func TestFrontendTiles(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server with configured tile colors
-		backend := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("2.0.0"),
-		)
+		backend := backendserver.NewTestServer("2.0.0", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
@@ -108,10 +102,7 @@ func TestFrontendTiles(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server
-		backend := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("1.0.0"),
-		)
+		backend := backendserver.NewTestServer("1.0.0", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
@@ -137,7 +128,7 @@ func TestFrontendTiles(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server
-		backend := backendserver.NewTestServer(backendserver.WithTestLogger(t))
+		backend := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
@@ -167,7 +158,7 @@ func TestFrontendTiles(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server
-		backend := backendserver.NewTestServer(backendserver.WithTestLogger(t))
+		backend := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(

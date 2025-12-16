@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	backendserver "phasor/backend/pkg/server"
+	backendserver "phasor/backend/testutil"
 
 	"github.com/monkescience/testastic"
 )
@@ -17,10 +17,7 @@ func TestBackendInstanceAPI(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a backend server with version 1.2.3
-		server := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("1.2.3"),
-		)
+		server := backendserver.NewTestServer("1.2.3", backendserver.NewTestLogger(t))
 		defer server.Close()
 
 		// WHEN: requesting instance info
@@ -37,10 +34,7 @@ func TestBackendInstanceAPI(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a backend server
-		server := backendserver.NewTestServer(
-			backendserver.WithTestLogger(t),
-			backendserver.WithVersion("1.0.0"),
-		)
+		server := backendserver.NewTestServer("1.0.0", backendserver.NewTestLogger(t))
 		defer server.Close()
 
 		// WHEN: requesting instance info twice
@@ -68,7 +62,7 @@ func TestBackendInstanceAPI(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a backend server
-		server := backendserver.NewTestServer(backendserver.WithTestLogger(t))
+		server := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
 		defer server.Close()
 
 		// WHEN: requesting the live health endpoint
@@ -83,7 +77,7 @@ func TestBackendInstanceAPI(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a backend server
-		server := backendserver.NewTestServer(backendserver.WithTestLogger(t))
+		server := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
 		defer server.Close()
 
 		// WHEN: requesting the ready health endpoint
