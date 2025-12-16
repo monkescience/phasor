@@ -16,6 +16,7 @@ func NewTestServer(opts ...Option) *httptest.Server {
 
 	router := app.SetupRouter(
 		app.WithVersion(options.Version),
+		app.WithHostnameFunc(options.GetHostname),
 		app.WithEnvironment("test"),
 		app.WithLogger(options.Logger),
 	)

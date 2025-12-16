@@ -152,13 +152,13 @@ func (h *FrontendHandler) TilesHandler(writer http.ResponseWriter, req *http.Req
 		}
 	}
 
-	// Sort by Version (descending), then Hostname (descending)
+	// Sort by Hostname (descending), then Version (descending)
 	slices.SortFunc(instances, func(a, b InstanceTileData) int {
-		if result := cmp.Compare(b.Info.Version, a.Info.Version); result != 0 {
+		if result := cmp.Compare(b.Info.Hostname, a.Info.Hostname); result != 0 {
 			return result
 		}
 
-		return cmp.Compare(b.Info.Hostname, a.Info.Hostname)
+		return cmp.Compare(b.Info.Version, a.Info.Version)
 	})
 
 	for i := range instances {

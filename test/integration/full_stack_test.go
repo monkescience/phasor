@@ -43,9 +43,7 @@ func TestFullStackFlow(t *testing.T) {
 
 		body := readBody(t, resp)
 		testastic.Contains(t, body, "2.0.0")
-		testastic.Contains(t, body, "Instance #1")
-		testastic.Contains(t, body, "Instance #2")
-		testastic.Contains(t, body, "Instance #3")
+		testastic.Contains(t, body, "class=\"tile\"")
 	})
 
 	t.Run("same version always gets same color", func(t *testing.T) {

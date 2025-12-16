@@ -1,15 +1,7 @@
 {{range .Instances}}
-<div class="tile" style="border-left: 6px solid {{.Color}}; border-right: 6px solid {{.HostnameColor}};">
-    <h3 style="color: {{.Color}};">Instance #{{.Index}}</h3>
+<div class="tile" style="border-left: 6px solid {{.HostnameColor}}; border-right: 6px solid {{.Color}};">
+    <h3><span style="color: {{.HostnameColor}};">{{.Info.Hostname}}</span><span style="color: {{.Color}}; float: right;">{{.Info.Version}}</span></h3>
     <div class="tile-info">
-        <div class="info-row">
-            <span class="info-label">Version:</span>
-            <span class="info-value">{{.Info.Version}}</span>
-        </div>
-        <div class="info-row">
-            <span class="info-label">Hostname:</span>
-            <span class="info-value">{{.Info.Hostname}}</span>
-        </div>
         <div class="info-row">
             <span class="info-label">Uptime:</span>
             <span class="info-value">{{.Info.Uptime}}</span>

@@ -152,7 +152,9 @@ func TestFrontendTiles(t *testing.T) {
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
 
 		body := readBody(t, resp)
-		testastic.Contains(t, body, "Instance #3")
+		// Count the number of tiles in the response (should be 3)
+		tileCount := strings.Count(body, "class=\"tile\"")
+		testastic.Equal(t, 3, tileCount)
 	})
 
 	t.Run("count is limited to maximum of 20", func(t *testing.T) {

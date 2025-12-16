@@ -19,7 +19,7 @@ func SetupRouter(opts ...Option) *chi.Mux {
 	router.Use(vital.RequestLogger(options.Logger))
 	router.Use(vital.TraceContext())
 
-	instanceHandler := instanceapi.NewInstanceHandler(options.Version)
+	instanceHandler := instanceapi.NewInstanceHandler(options.Version, options.GetHostname)
 	instanceapi.HandlerFromMux(instanceHandler, router)
 
 	healthHandler := vital.NewHealthHandler(
