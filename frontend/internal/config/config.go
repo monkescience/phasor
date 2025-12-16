@@ -16,13 +16,16 @@ var (
 	ErrBackendURLRequired = errors.New("backend_url must be configured in the config file")
 	// ErrConfigPathNotAbsolute is returned when the config file path is not absolute.
 	ErrConfigPathNotAbsolute = errors.New("config file path must be absolute")
+	// ErrEnvironmentRequired is returned when environment is not configured in the config file.
+	ErrEnvironmentRequired = errors.New("environment must be configured in the config file")
 )
 
 // Config holds the frontend application configuration.
 type Config struct {
-	BackendURL string   `yaml:"backend_url"` // URL of the backend service
-	TileColors []string `yaml:"tile_colors"` // Available colors for instance tiles based on version
-	LogConfig  struct {
+	BackendURL  string   `yaml:"backend_url"` // URL of the backend service
+	Environment string   `yaml:"environment"` // Environment name (e.g., local, dev, staging, prod)
+	TileColors  []string `yaml:"tile_colors"` // Colors for instance tiles
+	LogConfig   struct {
 		Level     string `yaml:"level"`      // Log level (debug, info, warn, error)
 		Format    string `yaml:"format"`     // Log format (json, text)
 		AddSource bool   `yaml:"add_source"` // Include source file and line number
@@ -59,6 +62,10 @@ func Load(path string) (*Config, error) {
 
 	if cfg.BackendURL == "" {
 		return nil, ErrBackendURLRequired
+	}
+
+	if cfg.Environment == "" {
+		return nil, ErrEnvironmentRequired
 	}
 
 	if len(cfg.TileColors) == 0 {

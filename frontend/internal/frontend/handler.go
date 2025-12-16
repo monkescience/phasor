@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"hash/fnv"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -68,9 +67,55 @@ type TilesData struct {
 	Instances []InstanceTileData
 }
 
+// colorTracker assigns unique colors to keys within a single request.
+type colorTracker struct {
+	colors   []string
+	assigned map[string]int
+	nextIdx  int
+}
+
+// newColorTracker creates a new color tracker with the given color palette.
+func newColorTracker(colors []string) *colorTracker {
+	return &colorTracker{
+		colors:   colors,
+		assigned: make(map[string]int),
+		nextIdx:  0,
+	}
+}
+
+// getColor returns a unique color for the given key.
+// Same key always returns the same color within a request.
+// Different keys get different colors until the palette is exhausted.
+func (ct *colorTracker) getColor(key string) string {
+	if len(ct.colors) == 0 {
+		return defaultFallbackColor
+	}
+
+	if idx, ok := ct.assigned[key]; ok {
+		return ct.colors[idx]
+	}
+
+	idx := ct.nextIdx % len(ct.colors)
+	ct.assigned[key] = idx
+	ct.nextIdx++
+
+	return ct.colors[idx]
+}
+
 // IndexData contains data for rendering the index page.
 type IndexData struct {
 	Count int
+}
+
+// errorInstanceInfo returns an InstanceInfoResponse for error cases.
+func errorInstanceInfo() InstanceInfoResponse {
+	return InstanceInfoResponse{
+		Version:   "error",
+		Hostname:  "failed to fetch",
+		Uptime:    "N/A",
+		GoVersion: "N/A",
+		Timestamp: time.Now(),
+	}
 }
 
 // NewFrontendHandler creates a new frontend handler with the specified templates path,
@@ -131,24 +176,21 @@ func (h *FrontendHandler) TilesHandler(writer http.ResponseWriter, req *http.Req
 		}
 	}
 
+	colorTracker := newColorTracker(h.tileColors)
+
 	instances := make([]InstanceTileData, count)
 	for i := range count {
 		info, err := h.fetchInstanceInfo(req.Context())
 		if err != nil {
-			info = InstanceInfoResponse{
-				Version:   "error",
-				Hostname:  "failed to fetch",
-				Uptime:    "N/A",
-				GoVersion: "N/A",
-				Timestamp: time.Now(),
-			}
+			info = errorInstanceInfo()
 		}
 
+		tileColor := colorTracker.getColor(info.Hostname + "|" + info.Version)
 		instances[i] = InstanceTileData{
 			Index:         i + 1,
 			Info:          info,
-			Color:         h.getColorForVersion(info.Version),
-			HostnameColor: h.getColorForHostname(info.Hostname),
+			Color:         tileColor,
+			HostnameColor: tileColor,
 		}
 	}
 
@@ -223,42 +265,4 @@ func (h *FrontendHandler) fetchInstanceInfo(
 	}
 
 	return info, nil
-}
-
-// getColorForVersion returns a color from the configured tile colors based on the version string.
-// Uses a hash function to deterministically select a color.
-func (h *FrontendHandler) getColorForVersion(version string) string {
-	if len(h.tileColors) == 0 {
-		return defaultFallbackColor
-	}
-
-	hasher := fnv.New32a()
-
-	_, err := hasher.Write([]byte(version))
-	if err != nil {
-		return defaultFallbackColor
-	}
-
-	index := int(hasher.Sum32()) % len(h.tileColors)
-
-	return h.tileColors[index]
-}
-
-// getColorForHostname returns a color from the configured tile colors based on the hostname string.
-// Uses a hash function to deterministically select a color.
-func (h *FrontendHandler) getColorForHostname(hostname string) string {
-	if len(h.tileColors) == 0 {
-		return defaultFallbackColor
-	}
-
-	hasher := fnv.New32a()
-
-	_, err := hasher.Write([]byte(hostname))
-	if err != nil {
-		return defaultFallbackColor
-	}
-
-	index := int(hasher.Sum32()) % len(h.tileColors)
-
-	return h.tileColors[index]
 }

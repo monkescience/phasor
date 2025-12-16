@@ -1,37 +1,26 @@
 package app
 
 import (
-	"errors"
 	"fmt"
+	"log/slog"
+	"phasor/frontend/internal/config"
 	"phasor/frontend/internal/frontend"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/monkescience/vital"
 )
 
-// ErrTemplatesPathRequired is returned when TemplatesPath is not provided.
-var ErrTemplatesPathRequired = errors.New("TemplatesPath is required: use WithTemplatesPath option")
-
 // SetupRouter creates and configures the application router with all middleware and handlers.
-func SetupRouter(opts ...Option) (*chi.Mux, error) {
-	options := DefaultOptions()
-	for _, opt := range opts {
-		opt(&options)
-	}
-
-	if options.TemplatesPath == "" {
-		return nil, ErrTemplatesPathRequired
-	}
-
+func SetupRouter(cfg *config.Config, templatesPath string, logger *slog.Logger) (*chi.Mux, error) {
 	router := chi.NewRouter()
-	router.Use(vital.Recovery(options.Logger))
-	router.Use(vital.RequestLogger(options.Logger))
+	router.Use(vital.Recovery(logger))
+	router.Use(vital.RequestLogger(logger))
 	router.Use(vital.TraceContext())
 
 	frontendHandler, err := frontend.NewFrontendHandler(
-		options.TemplatesPath,
-		options.BackendURL,
-		options.TileColors,
+		templatesPath,
+		cfg.BackendURL,
+		cfg.TileColors,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create frontend handler: %w", err)
@@ -41,7 +30,7 @@ func SetupRouter(opts ...Option) (*chi.Mux, error) {
 	router.Get("/tiles", frontendHandler.TilesHandler)
 
 	healthHandler := vital.NewHealthHandler(
-		vital.WithEnvironment(options.Environment),
+		vital.WithEnvironment(cfg.Environment),
 	)
 	router.Mount("/health", healthHandler)
 

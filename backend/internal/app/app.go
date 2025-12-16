@@ -1,6 +1,10 @@
 package app
 
 import (
+	"log/slog"
+	"os"
+	"phasor/backend/internal/config"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/monkescience/vital"
 
@@ -8,25 +12,36 @@ import (
 )
 
 // SetupRouter creates and configures the application router with all middleware and handlers.
-func SetupRouter(opts ...Option) *chi.Mux {
-	options := DefaultOptions()
-	for _, opt := range opts {
-		opt(&options)
-	}
+func SetupRouter(cfg *config.Config, logger *slog.Logger) *chi.Mux {
+	return SetupRouterWithHostname(cfg, logger, systemHostname)
+}
 
+// SetupRouterWithHostname creates and configures the application router with a custom hostname function.
+// This is primarily useful for testing with deterministic hostnames.
+func SetupRouterWithHostname(cfg *config.Config, logger *slog.Logger, getHostname instanceapi.HostnameFunc) *chi.Mux {
 	router := chi.NewRouter()
-	router.Use(vital.Recovery(options.Logger))
-	router.Use(vital.RequestLogger(options.Logger))
+	router.Use(vital.Recovery(logger))
+	router.Use(vital.RequestLogger(logger))
 	router.Use(vital.TraceContext())
 
-	instanceHandler := instanceapi.NewInstanceHandler(options.Version, options.GetHostname)
+	instanceHandler := instanceapi.NewInstanceHandler(cfg.Version, getHostname)
 	instanceapi.HandlerFromMux(instanceHandler, router)
 
 	healthHandler := vital.NewHealthHandler(
-		vital.WithVersion(options.Version),
-		vital.WithEnvironment(options.Environment),
+		vital.WithVersion(cfg.Version),
+		vital.WithEnvironment(cfg.Environment),
 	)
 	router.Mount("/health", healthHandler)
 
 	return router
+}
+
+// systemHostname returns the system hostname or "unknown" if it cannot be determined.
+func systemHostname() string {
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "unknown"
+	}
+
+	return hostname
 }

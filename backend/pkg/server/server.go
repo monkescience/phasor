@@ -4,6 +4,7 @@ package server
 import (
 	"net/http/httptest"
 	"phasor/backend/internal/app"
+	"phasor/backend/internal/config"
 )
 
 // NewTestServer creates a fully configured test server with the same middleware
@@ -14,12 +15,12 @@ func NewTestServer(opts ...Option) *httptest.Server {
 		opt(&options)
 	}
 
-	router := app.SetupRouter(
-		app.WithVersion(options.Version),
-		app.WithHostnameFunc(options.GetHostname),
-		app.WithEnvironment("test"),
-		app.WithLogger(options.Logger),
-	)
+	cfg := &config.Config{
+		Version:     options.Version,
+		Environment: "test",
+	}
+
+	router := app.SetupRouterWithHostname(cfg, options.Logger, options.GetHostname)
 
 	return httptest.NewServer(router)
 }

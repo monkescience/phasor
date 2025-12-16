@@ -12,6 +12,8 @@ import (
 	"github.com/monkescience/testastic"
 )
 
+var defaultTileColors = []string{"#667eea", "#f093fb", "#4facfe", "#43e97b", "#fa709a", "#feca57", "#ff6348", "#1dd1a1"}
+
 func TestFrontendHandler(t *testing.T) {
 	t.Parallel()
 
@@ -26,9 +28,10 @@ func TestFrontendHandler(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
+			backend.URL+"/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -51,9 +54,10 @@ func TestFrontendHandler(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
+			backend.URL+"/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -82,10 +86,10 @@ func TestFrontendTiles(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
-			frontendserver.WithTileColors([]string{"#667eea", "#f093fb"}),
+			backend.URL+"/instance/info",
+			[]string{"#667eea", "#f093fb"},
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -111,9 +115,10 @@ func TestFrontendTiles(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
+			backend.URL+"/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -136,9 +141,10 @@ func TestFrontendTiles(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
+			backend.URL+"/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -165,9 +171,10 @@ func TestFrontendTiles(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
+			backend.URL+"/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -189,9 +196,10 @@ func TestFrontendTiles(t *testing.T) {
 
 		// GIVEN: a frontend server with unreachable backend
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL("http://localhost:59999/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
+			"http://localhost:59999/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 

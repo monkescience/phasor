@@ -3,6 +3,9 @@
 # Backend service URL (via Traefik load balancer)
 backend_url: "http://traefik:80/instance/info"
 
+# Environment name (e.g., local, dev, staging, prod)
+environment: "local"
+
 # Log configuration using vital library
 log_config:
   # Log level: debug, info, warn, error
@@ -12,9 +15,7 @@ log_config:
   # Include source file and line number in logs
   add_source: false
 
-# Tile color configuration
-# These colors will be used for instance tiles based on version
-# Colors are selected deterministically based on version hash
+# Tile colors (first unique hostname+version combination gets first color)
 tile_colors:
   - "#667eea"  # Purple-blue
   - "#f093fb"  # Pink

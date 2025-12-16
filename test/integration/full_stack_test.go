@@ -25,10 +25,10 @@ func TestFullStackFlow(t *testing.T) {
 		defer backend.Close()
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
-			frontendserver.WithTileColors([]string{"#667eea", "#f093fb", "#4facfe"}),
+			backend.URL+"/instance/info",
+			[]string{"#667eea", "#f093fb", "#4facfe"},
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -56,13 +56,13 @@ func TestFullStackFlow(t *testing.T) {
 		)
 		defer backend.Close()
 
-		colors := []string{"#667eea", "#f093fb", "#4facfe", "#43e97b"}
+		tileColors := []string{"#667eea", "#f093fb", "#4facfe", "#43e97b"}
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
-			frontendserver.WithTileColors(colors),
+			backend.URL+"/instance/info",
+			tileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -77,10 +77,10 @@ func TestFullStackFlow(t *testing.T) {
 		body2 := readBody(t, resp2)
 		resp2.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		// THEN: same version produces same color in both responses
+		// THEN: same hostname+version produces same color in both responses
 		var color1, color2 string
 
-		for _, color := range colors {
+		for _, color := range tileColors {
 			if strings.Contains(body1, color) {
 				color1 = color
 			}
@@ -104,13 +104,13 @@ func TestFullStackFlow(t *testing.T) {
 		)
 		defer backend.Close()
 
-		customColors := []string{"#ff0000", "#00ff00", "#0000ff"}
+		tileColors := []string{"#ff0000", "#00ff00", "#0000ff", "#ffff00"}
 
 		frontend, err := frontendserver.NewTestServer(
-			frontendserver.WithTestLogger(t),
-			frontendserver.WithBackendURL(backend.URL+"/instance/info"),
-			frontendserver.WithTemplatesPath(templatesPath()),
-			frontendserver.WithTileColors(customColors),
+			backend.URL+"/instance/info",
+			tileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
 		)
 		testastic.NoError(t, err)
 
@@ -126,7 +126,7 @@ func TestFullStackFlow(t *testing.T) {
 		body := readBody(t, resp)
 		hasConfiguredColor := false
 
-		for _, color := range customColors {
+		for _, color := range tileColors {
 			if strings.Contains(body, color) {
 				hasConfiguredColor = true
 

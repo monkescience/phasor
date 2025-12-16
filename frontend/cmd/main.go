@@ -33,13 +33,7 @@ func main() {
 
 	templatesPath := filepath.Join("frontend", "internal", "frontend", "templates")
 
-	router, err := app.SetupRouter(
-		app.WithBackendURL(cfg.BackendURL),
-		app.WithTileColors(cfg.TileColors),
-		app.WithTemplatesPath(templatesPath),
-		app.WithEnvironment("production"),
-		app.WithLogger(logger),
-	)
+	router, err := app.SetupRouter(cfg, templatesPath, logger)
 	if err != nil {
 		log.Fatalf("failed to setup router: %v", err)
 	}

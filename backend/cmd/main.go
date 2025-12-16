@@ -30,11 +30,7 @@ func main() {
 		log.Fatalf("failed to setup logger: %v", err)
 	}
 
-	router := app.SetupRouter(
-		app.WithVersion(cfg.Version),
-		app.WithEnvironment("production"),
-		app.WithLogger(logger),
-	)
+	router := app.SetupRouter(cfg, logger)
 
 	vital.NewServer(router, vital.WithPort(serverPort), vital.WithLogger(logger)).Run()
 }

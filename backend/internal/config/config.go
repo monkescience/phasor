@@ -14,12 +14,15 @@ var (
 	ErrVersionRequired = errors.New("VERSION environment variable is required")
 	// ErrConfigPathNotAbsolute is returned when the config file path is not absolute.
 	ErrConfigPathNotAbsolute = errors.New("config file path must be absolute")
+	// ErrEnvironmentRequired is returned when environment is not configured in the config file.
+	ErrEnvironmentRequired = errors.New("environment must be configured in the config file")
 )
 
 // Config holds the backend application configuration.
 type Config struct {
-	Version   string `yaml:"-"` // Version must be set via VERSION environment variable only
-	LogConfig struct {
+	Version     string `yaml:"-"`           // Version must be set via VERSION environment variable only
+	Environment string `yaml:"environment"` // Environment name (e.g., production, development, local)
+	LogConfig   struct {
 		Level     string `yaml:"level"`      // Log level (debug, info, warn, error)
 		Format    string `yaml:"format"`     // Log format (json, text)
 		AddSource bool   `yaml:"add_source"` // Include source file and line number
@@ -58,6 +61,10 @@ func Load(path string) (*Config, error) {
 	cfg.Version = os.Getenv("VERSION")
 	if cfg.Version == "" {
 		return nil, ErrVersionRequired
+	}
+
+	if cfg.Environment == "" {
+		return nil, ErrEnvironmentRequired
 	}
 
 	return &cfg, nil

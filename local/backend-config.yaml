@@ -1,5 +1,8 @@
 # Backend Service Configuration
 
+# Environment name (e.g., production, development, local)
+environment: "local"
+
 # Log configuration using vital library
 log_config:
   # Log level: debug, info, warn, error

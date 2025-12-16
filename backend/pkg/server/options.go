@@ -45,10 +45,3 @@ func WithHostname(hostname string) Option {
 		o.GetHostname = func() string { return hostname }
 	}
 }
-
-// WithHostnameFunc sets the hostname function for the test server.
-func WithHostnameFunc(fn instanceapi.HostnameFunc) Option {
-	return func(o *TestServerOptions) {
-		o.GetHostname = fn
-	}
-}

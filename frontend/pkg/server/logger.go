@@ -31,12 +31,3 @@ func NewTestLogger(t *testing.T) *slog.Logger {
 
 	return slog.New(&testLogHandler{t: t, level: slog.LevelDebug})
 }
-
-// WithTestLogger creates a logger that outputs to t.Log().
-func WithTestLogger(t *testing.T) Option {
-	t.Helper()
-
-	return func(o *TestServerOptions) {
-		o.Logger = NewTestLogger(t)
-	}
-}
