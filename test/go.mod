@@ -7,7 +7,7 @@ replace phasor/backend => ../backend
 replace phasor/frontend => ../frontend
 
 require (
-	github.com/monkescience/testastic v0.0.0-20251214185222-b77258d65048
+	github.com/monkescience/testastic v0.0.0-20251216213937-22bb94593d66
 	phasor/backend v0.0.0
 	phasor/frontend v0.0.0
 )
@@ -31,4 +31,5 @@ require (
 	golang.org/x/net v0.48.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/term v0.38.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

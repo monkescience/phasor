@@ -40,10 +40,10 @@ func TestFrontendHandler(t *testing.T) {
 
 		// THEN: response matches expected HTML structure
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-		testastic.AssertHTML(t, testdataPath("frontend_index", "response.html"), resp.Body)
+		testastic.AssertHTML(t, testdataPath("frontend_index", "expected_response.html"), resp.Body)
 	})
 
-	t.Run("health endpoint responds OK", func(t *testing.T) {
+	t.Run("health live endpoint responds OK", func(t *testing.T) {
 		t.Parallel()
 
 		// GIVEN: a frontend server
@@ -60,12 +60,39 @@ func TestFrontendHandler(t *testing.T) {
 
 		defer frontend.Close()
 
-		// WHEN: requesting the health endpoint
+		// WHEN: requesting the live health endpoint
 		resp := httpGet(t, frontend.URL+"/health/live")
 		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
 
-		// THEN: response status is OK
+		// THEN: response matches expected JSON structure
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
+		testastic.AssertJSON(t, testdataPath("frontend_health_live", "expected_response.json"), resp.Body)
+	})
+
+	t.Run("health ready endpoint responds OK", func(t *testing.T) {
+		t.Parallel()
+
+		// GIVEN: a frontend server
+		backend := backendserver.NewTestServer("test-version", backendserver.NewTestLogger(t))
+		defer backend.Close()
+
+		frontend, err := frontendserver.NewTestServer(
+			backend.URL+"/instance/info",
+			defaultTileColors,
+			templatesPath(),
+			frontendserver.NewTestLogger(t),
+		)
+		testastic.NoError(t, err)
+
+		defer frontend.Close()
+
+		// WHEN: requesting the ready health endpoint
+		resp := httpGet(t, frontend.URL+"/health/ready")
+		defer resp.Body.Close() //nolint:errcheck // Ignoring close error in test cleanup.
+
+		// THEN: response matches expected JSON structure
+		testastic.Equal(t, http.StatusOK, resp.StatusCode)
+		testastic.AssertJSON(t, testdataPath("frontend_health_ready", "expected_response.json"), resp.Body)
 	})
 }
 
@@ -95,7 +122,7 @@ func TestFrontendTiles(t *testing.T) {
 
 		// THEN: response matches expected HTML structure
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-		testastic.AssertHTML(t, testdataPath("frontend_tiles_count_2", "response.html"), resp.Body)
+		testastic.AssertHTML(t, testdataPath("frontend_tiles_count_2", "expected_response.html"), resp.Body)
 	})
 
 	t.Run("tile count parameter is respected", func(t *testing.T) {
@@ -121,7 +148,7 @@ func TestFrontendTiles(t *testing.T) {
 
 		// THEN: response matches expected HTML structure with 5 tiles
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-		testastic.AssertHTML(t, testdataPath("frontend_tiles_count_5", "response.html"), resp.Body)
+		testastic.AssertHTML(t, testdataPath("frontend_tiles_count_5", "expected_response.html"), resp.Body)
 	})
 
 	t.Run("invalid count uses default of 3", func(t *testing.T) {
@@ -202,7 +229,7 @@ func TestFrontendTiles(t *testing.T) {
 
 		// THEN: response shows error state gracefully
 		testastic.Equal(t, http.StatusOK, resp.StatusCode)
-		testastic.AssertHTML(t, testdataPath("frontend_tiles_error", "response.html"), resp.Body)
+		testastic.AssertHTML(t, testdataPath("frontend_tiles_error", "expected_response.html"), resp.Body)
 	})
 }
 

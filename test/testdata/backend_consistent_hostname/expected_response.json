@@ -1,0 +1,7 @@
+{
+  "go_version": "{{anyString}}",
+  "hostname": "test-host",
+  "timestamp": "{{regex `^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.*$`}}",
+  "uptime": "{{regex `^[0-9.]+[a-zµ]+$`}}",
+  "version": "1.0.0"
+}
