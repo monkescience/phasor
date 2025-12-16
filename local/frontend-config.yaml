@@ -1,6 +1,6 @@
 # Frontend Service Configuration
 
-# Backend service URL (via Traefik)
+# Backend service URL (via Traefik load balancer)
 backend_url: "http://traefik:80/instance/info"
 
 # Log configuration using vital library

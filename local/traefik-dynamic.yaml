@@ -1,7 +1,4 @@
-# Traefik Dynamic Configuration
-
 http:
-  # Routers
   routers:
     backend:
       rule: "PathPrefix(`/instance`) || PathPrefix(`/health`)"
@@ -9,18 +6,15 @@ http:
       entryPoints:
         - web
 
-  # Services
   services:
     backend:
       loadBalancer:
-        # Define all 3 backend servers using Docker network DNS
-        # Docker Compose creates containers with names: <project>-<service>-<replica>
+        # Explicit server list for each replica
+        # Container names: <directory>-<service>-<replica>
         servers:
-          - url: "http://reference-service-go-backend-1:8080"
-          - url: "http://reference-service-go-backend-2:8080"
-          - url: "http://reference-service-go-backend-3:8080"
+          - url: "http://local-phasor-backend-1:8080"
+          - url: "http://local-phasor-backend-2:8080"
         
-        # Health check configuration
         healthCheck:
           path: "/health/live"
           interval: "10s"
