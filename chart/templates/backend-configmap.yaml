@@ -6,7 +6,4 @@ metadata:
     {{- include "phasor.backend.labels" . | nindent 4 }}
 data:
   config.yaml: |
-    log_config:
-      level: {{ .Values.backend.config.log_config.level | default "info" | quote }}
-      format: {{ .Values.backend.config.log_config.format | default "json" | quote }}
-      add_source: {{ .Values.backend.config.log_config.add_source | default false }}
+    {{- .Values.backend.config | toYaml | nindent 4 }}

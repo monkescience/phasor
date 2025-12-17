@@ -28,10 +28,10 @@ backend:
       memory: 128Mi
 
   config:
-    log_config:
-      level: "info"
-      format: "json"
-      add_source: false
+#    log_config:
+#      level: "info"
+#      format: "json"
+#      add_source: false
 
   autoscaling:
     enabled: false
@@ -63,19 +63,20 @@ frontend:
       memory: 128Mi
 
   config:
-    log_config:
-      level: "info"
-      format: "json"
-      add_source: false
-    tile_colors:
-      - "#667eea"  # Purple-blue
-      - "#f093fb"  # Pink
-      - "#4facfe"  # Light blue
-      - "#43e97b"  # Green
-      - "#fa709a"  # Rose
-      - "#feca57"  # Yellow
-      - "#ff6348"  # Coral
-      - "#1dd1a1"  # Turquoise
+#    backend_url: "http://phasor-backend/instance/info"
+#    log_config:
+#      level: "info"
+#      format: "json"
+#      add_source: false
+#    tile_colors:
+#      - "#667eea"  # Purple-blue
+#      - "#f093fb"  # Pink
+#      - "#4facfe"  # Light blue
+#      - "#43e97b"  # Green
+#      - "#fa709a"  # Rose
+#      - "#feca57"  # Yellow
+#      - "#ff6348"  # Coral
+#      - "#1dd1a1"  # Turquoise
 
   autoscaling:
     enabled: false
