@@ -27,6 +27,7 @@ spec:
       labels:
         {{- include "phasor.backend.labels" . | nindent 8 }}
     spec:
+      serviceAccountName: {{ include "phasor.serviceAccountName" . }}
       securityContext:
         runAsNonRoot: true
         runAsUser: 1001

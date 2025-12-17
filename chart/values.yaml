@@ -3,44 +3,65 @@
 nameOverride: ""
 fullnameOverride: ""
 
+# ServiceAccount configuration
+serviceAccount:
+  create: true
+  automount: false
+  name: ""  # Override ServiceAccount name (defaults to release fullname)
+  annotations: {}
+    # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/phasor
+
 # Backend service configuration
 backend:
   replicaCount: 3
-  
+
   image:
     repository: ghcr.io/monkescience/phasor-backend
     pullPolicy: IfNotPresent
     tag: ""  # Defaults to chart appVersion
-  
+
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
     limits:
       memory: 128Mi
-  
+
   config:
     log_config:
       level: "info"
       format: "json"
       add_source: false
 
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: ""
+    behavior: {}
+
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
 # Frontend service configuration
 frontend:
   replicaCount: 2
-  
+
   image:
     repository: ghcr.io/monkescience/phasor-frontend
     pullPolicy: IfNotPresent
     tag: ""  # Defaults to chart appVersion
-  
+
   resources:
     requests:
       cpu: 100m
       memory: 128Mi
     limits:
       memory: 128Mi
-  
+
   config:
     log_config:
       level: "info"
@@ -55,6 +76,41 @@ frontend:
       - "#feca57"  # Yellow
       - "#ff6348"  # Coral
       - "#1dd1a1"  # Turquoise
+
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 80
+    targetMemoryUtilizationPercentage: ""
+    behavior: {}
+
+  podDisruptionBudget:
+    enabled: false
+    minAvailable: 1
+    # maxUnavailable: 1
+
+# NetworkPolicy configuration
+networkPolicy:
+  enabled: false
+  backend:
+    additionalIngress: []
+    additionalEgress: []
+  frontend:
+    additionalIngress: []
+    additionalEgress: []
+
+# HTTPRoute (Gateway API) configuration
+httpRoute:
+  enabled: false
+  annotations: {}
+  parentRefs:
+    - name: gateway
+      # namespace: gateway-system
+      # sectionName: https
+  hostnames: []
+    # - phasor.example.com
+  exposeBackend: false  # Expose backend at /api
 
 # Dapr sidecar configuration
 dapr:

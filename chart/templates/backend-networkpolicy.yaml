@@ -1,0 +1,38 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "phasor.backend.fullname" . }}
+  labels:
+    {{- include "phasor.backend.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "phasor.backend.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              {{- include "phasor.frontend.selectorLabels" . | nindent 14 }}
+      ports:
+        - protocol: TCP
+          port: 8080
+    {{- if .Values.networkPolicy.backend.additionalIngress }}
+    {{- toYaml .Values.networkPolicy.backend.additionalIngress | nindent 4 }}
+    {{- end }}
+  egress:
+    - to:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+      ports:
+        - protocol: UDP
+          port: 53
+    {{- if .Values.networkPolicy.backend.additionalEgress }}
+    {{- toYaml .Values.networkPolicy.backend.additionalEgress | nindent 4 }}
+    {{- end }}
+{{- end }}

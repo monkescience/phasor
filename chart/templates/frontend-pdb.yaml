@@ -1,0 +1,18 @@
+{{- if .Values.frontend.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "phasor.frontend.fullname" . }}
+  labels:
+    {{- include "phasor.frontend.labels" . | nindent 4 }}
+spec:
+  {{- with .Values.frontend.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.frontend.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "phasor.frontend.selectorLabels" . | nindent 6 }}
+{{- end }}

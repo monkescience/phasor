@@ -93,3 +93,14 @@ Frontend selector labels
 {{ include "phasor.selectorLabels" . }}
 app.kubernetes.io/component: frontend
 {{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "phasor.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create }}
+{{- default (include "phasor.fullname" .) .Values.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
