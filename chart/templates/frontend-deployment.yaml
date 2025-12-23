@@ -16,14 +16,6 @@ spec:
       {{- include "phasor.frontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- if .Values.dapr.enabled }}
-      annotations:
-        dapr.io/enabled: "true"
-        dapr.io/app-id: {{ .Values.dapr.frontend.appId | quote }}
-        dapr.io/app-port: "8081"
-        dapr.io/config: {{ .Values.dapr.config | quote }}
-        dapr.io/log-level: {{ .Values.dapr.logLevel | quote }}
-      {{- end }}
       labels:
         {{- include "phasor.frontend.labels" . | nindent 8 }}
     spec:

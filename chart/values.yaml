@@ -112,13 +112,3 @@ httpRoute:
   hostnames: []
     # - phasor.example.com
   exposeBackend: false  # Expose backend at /api
-
-# Dapr sidecar configuration
-dapr:
-  enabled: false
-  config: "daprconfig"
-  logLevel: "info"
-  backend:
-    appId: "phasor-backend"
-  frontend:
-    appId: "phasor-frontend"
