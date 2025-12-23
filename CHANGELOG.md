@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/monkescience/phasor/compare/0.3.0...0.4.0) (2025-12-23)
+
+
+### Features
+
+* add config checksum annotation to frontend and backend deployments ([75e47c4](https://github.com/monkescience/phasor/commit/75e47c416d0c863b795d687980f7d4ee1f117740))
+* add Renovate bot with workflow and schema integration ([69f2b86](https://github.com/monkescience/phasor/commit/69f2b86768924224a7c5638248030c83df9b8d69))
+
 ## [0.3.0](https://github.com/monkescience/phasor/compare/0.2.0...0.3.0) (2025-12-18)
 
 
