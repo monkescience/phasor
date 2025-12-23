@@ -16,6 +16,8 @@ spec:
       {{- include "phasor.frontend.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/frontend-configmap.yaml") . | sha256sum }}
       labels:
         {{- include "phasor.frontend.labels" . | nindent 8 }}
     spec:
