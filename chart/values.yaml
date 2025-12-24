@@ -46,6 +46,21 @@ backend:
     minAvailable: 1
     # maxUnavailable: 1
 
+  rollout:
+    strategy: canary
+    smokeTest:
+      enabled: true
+      replicas: 1
+    steps:
+      - setWeight: 20
+      - pause: { duration: 60s }
+      - setWeight: 40
+      - pause: { duration: 60s }
+      - setWeight: 60
+      - pause: { duration: 60s }
+      - setWeight: 80
+      - pause: { duration: 60s }
+
 # Frontend service configuration
 frontend:
   replicaCount: 2
@@ -90,6 +105,13 @@ frontend:
     enabled: false
     minAvailable: 1
     # maxUnavailable: 1
+
+  rollout:
+    strategy: blueGreen
+    blueGreen:
+      autoPromotionEnabled: false
+      prePromotionAnalysis:
+        enabled: true
 
 # NetworkPolicy configuration
 networkPolicy:
