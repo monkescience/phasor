@@ -20,7 +20,7 @@ env:
   REGISTRY: ghcr.io
   HELM_CHART_NAME: phasor
   HELM_REPOSITORY: monkescience/helm-charts
-  HELM_VERSION: v3.19.0 # renovate: datasource=github-releases depName=helm/helm
+  HELM_VERSION: v4.0.2 # renovate: datasource=github-releases depName=helm/helm
 
 jobs:
   release-please:
