@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  HELM_VERSION: v3.19.0 # renovate: datasource=github-releases depName=helm/helm
+  HELM_VERSION: v4.0.2 # renovate: datasource=github-releases depName=helm/helm
 
 jobs:
   helm-validate:
