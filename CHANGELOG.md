@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.0](https://github.com/monkescience/phasor/compare/0.5.0...0.6.0) (2026-01-05)
+
+
+### Features
+
+* add Gateway API traffic routing to backend rollout and configure analysis templates with health check count ([d49721d](https://github.com/monkescience/phasor/commit/d49721dcd425a7471f68f8697b60cd55c81924a1))
+
 ## [0.5.0](https://github.com/monkescience/phasor/compare/0.4.0...0.5.0) (2026-01-05)
 
 
