@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0](https://github.com/monkescience/phasor/compare/0.4.0...0.5.0) (2026-01-05)
+
+
+### Features
+
+* add canary and blue-green rollout support for backend and frontend services, including health checks and associated services ([4bc3d9c](https://github.com/monkescience/phasor/commit/4bc3d9c72c013abaaeb733da560c7c7e876601f6))
+
 ## [0.4.0](https://github.com/monkescience/phasor/compare/0.3.0...0.4.0) (2025-12-23)
 
 
