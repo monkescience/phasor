@@ -14,6 +14,11 @@ spec:
     canary:
       stableService: {{ include "phasor.backend.fullname" . }}
       canaryService: {{ include "phasor.backend.fullname" . }}-canary
+      trafficRouting:
+        plugins:
+          argoproj-labs/gatewayAPI:
+            httpRoute: {{ include "phasor.fullname" . }}
+            namespace: {{ .Release.Namespace }}
       steps:
         {{- if .Values.backend.rollout.smokeTest.enabled }}
         - setCanaryScale:

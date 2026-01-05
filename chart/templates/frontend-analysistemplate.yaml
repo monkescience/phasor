@@ -7,6 +7,7 @@ metadata:
 spec:
   metrics:
     - name: health-check
+      count: 5
       interval: 10s
       failureLimit: 3
       successCondition: result == "Healthy"
