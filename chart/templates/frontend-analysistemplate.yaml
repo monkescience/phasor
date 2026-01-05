@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "phasor.frontend.fullname" . }}-health
+  labels:
+    {{- include "phasor.frontend.labels" . | nindent 4 }}
+spec:
+  metrics:
+    - name: health-check
+      interval: 10s
+      failureLimit: 3
+      successCondition: result == "Healthy"
+      provider:
+        web:
+          {{- if eq .Values.frontend.rollout.strategy "blueGreen" }}
+          url: http://{{ include "phasor.frontend.fullname" . }}-preview:80/health/live
+          {{- else }}
+          url: http://{{ include "phasor.frontend.fullname" . }}:80/health/live
+          {{- end }}
+          jsonPath: "{$.status}"

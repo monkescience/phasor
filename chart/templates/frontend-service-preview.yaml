@@ -1,0 +1,17 @@
+{{- if eq .Values.frontend.rollout.strategy "blueGreen" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "phasor.frontend.fullname" . }}-preview
+  labels:
+    {{- include "phasor.frontend.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "phasor.frontend.selectorLabels" . | nindent 4 }}
+{{- end }}

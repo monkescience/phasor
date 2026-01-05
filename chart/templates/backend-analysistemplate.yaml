@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "phasor.backend.fullname" . }}-health
+  labels:
+    {{- include "phasor.backend.labels" . | nindent 4 }}
+spec:
+  metrics:
+    - name: health-check
+      interval: 10s
+      failureLimit: 3
+      successCondition: result == "Healthy"
+      provider:
+        web:
+          url: http://{{ include "phasor.backend.fullname" . }}-canary:80/health/live
+          jsonPath: "{$.status}"
