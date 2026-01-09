@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	github.com/go-chi/chi/v5 v5.2.3
-	github.com/monkescience/vital v0.0.0-20251214151552-f348439ddad8
+	github.com/monkescience/vital v0.0.0-20251223172315-8503480c42fe
 	github.com/oapi-codegen/oapi-codegen/v2 v2.5.1
 	gopkg.in/yaml.v3 v3.0.1
 )
