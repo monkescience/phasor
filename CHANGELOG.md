@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.0](https://github.com/monkescience/phasor/compare/0.6.0...0.7.0) (2026-01-10)
+
+
+### Features
+
+* add HTTPRoute template for Gateway API traffic routing in backend rollout ([15e6723](https://github.com/monkescience/phasor/commit/15e67234130325a37b6c2b86ad5daa579dcc2200))
+
+
+### Bug Fixes
+
+* **deps:** update github.com/monkescience/vital digest to 8503480 ([#15](https://github.com/monkescience/phasor/issues/15)) ([65a86fd](https://github.com/monkescience/phasor/commit/65a86fda7a84bac48abaa63aa3b5f5be54084db6))
+
 ## [0.6.0](https://github.com/monkescience/phasor/compare/0.5.0...0.6.0) (2026-01-05)
 
 
