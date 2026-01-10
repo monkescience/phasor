@@ -10,7 +10,7 @@ spec:
       count: 5
       interval: 10s
       failureLimit: 3
-      successCondition: result == "Healthy"
+      successCondition: result == "ok"
       provider:
         web:
           url: http://{{ include "phasor.backend.fullname" . }}-canary.{{ .Release.Namespace }}.svc:80/health/live
