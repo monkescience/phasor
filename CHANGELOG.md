@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.2](https://github.com/monkescience/phasor/compare/0.7.1...0.7.2) (2026-01-10)
+
+
+### Bug Fixes
+
+* change successCondition from Healthy to ok ([6f8ff8c](https://github.com/monkescience/phasor/commit/6f8ff8c232b078beba25db7fcc13495efe0072dd))
+
 ## [0.7.1](https://github.com/monkescience/phasor/compare/0.7.0...0.7.1) (2026-01-10)
 
 
