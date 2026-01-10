@@ -17,7 +17,7 @@ spec:
     blueGreen:
       activeService: {{ include "phasor.frontend.fullname" . }}
       previewService: {{ include "phasor.frontend.fullname" . }}-preview
-      autoPromotionEnabled: {{ .Values.frontend.rollout.blueGreen.autoPromotionEnabled | default false }}
+      autoPromotionEnabled: {{ .Values.frontend.rollout.blueGreen.autoPromotionEnabled }}
       {{- if .Values.frontend.rollout.blueGreen.prePromotionAnalysis.enabled }}
       prePromotionAnalysis:
         templates:

@@ -118,7 +118,7 @@ frontend:
   rollout:
     strategy: blueGreen
     blueGreen:
-      autoPromotionEnabled: false
+      autoPromotionEnabled: true
       prePromotionAnalysis:
         enabled: true
 
