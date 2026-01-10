@@ -24,7 +24,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: {{ .Values.backend.rollout.httpRoute.pathPrefix | default "/api" }}
+            value: {{ .Values.backend.rollout.httpRoute.pathPrefix }}
       backendRefs:
         - name: {{ include "phasor.backend.fullname" . }}
           port: 80

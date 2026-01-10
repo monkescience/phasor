@@ -27,7 +27,7 @@ spec:
       steps:
         {{- if .Values.backend.rollout.smokeTest.enabled }}
         - setCanaryScale:
-            replicas: {{ .Values.backend.rollout.smokeTest.replicas | default 1 }}
+            replicas: {{ .Values.backend.rollout.smokeTest.replicas }}
         - analysis:
             templates:
               - templateName: {{ include "phasor.backend.fullname" . }}-health
