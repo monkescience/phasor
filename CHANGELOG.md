@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1](https://github.com/monkescience/phasor/compare/0.7.0...0.7.1) (2026-01-10)
+
+
+### Bug Fixes
+
+* use FQDN in analysis template health check URLs ([398ca36](https://github.com/monkescience/phasor/commit/398ca36e378f5a9990c648da3792454e5399e707))
+
 ## [0.7.0](https://github.com/monkescience/phasor/compare/0.6.0...0.7.0) (2026-01-10)
 
 
