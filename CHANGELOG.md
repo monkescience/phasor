@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.0](https://github.com/monkescience/phasor/compare/0.7.2...0.8.0) (2026-01-10)
+
+
+### Features
+
+* enable auto promotion for frontend blue-green rollout ([ded028d](https://github.com/monkescience/phasor/commit/ded028d19a5a5818c5dff41abcaec70a2ab91a41))
+* limit analysis run history to 3 successful and 3 unsuccessful ([3602592](https://github.com/monkescience/phasor/commit/360259266db9532b99983851e01d6f483ebe7f6c))
+
 ## [0.7.2](https://github.com/monkescience/phasor/compare/0.7.1...0.7.2) (2026-01-10)
 
 
