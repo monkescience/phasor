@@ -1,0 +1,33 @@
+{{- if .Values.backend.rollout.httpRoute.enabled }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "phasor.backend.fullname" . }}
+  labels:
+    {{- include "phasor.backend.labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    {{- range .Values.backend.rollout.httpRoute.parentRefs }}
+    - name: {{ .name }}
+      {{- with .namespace }}
+      namespace: {{ . }}
+      {{- end }}
+      {{- with .sectionName }}
+      sectionName: {{ . }}
+      {{- end }}
+    {{- end }}
+  {{- with .Values.backend.rollout.httpRoute.hostnames }}
+  hostnames:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.backend.rollout.httpRoute.pathPrefix | default "/api" }}
+      backendRefs:
+        - name: {{ include "phasor.backend.fullname" . }}
+          port: 80
+        - name: {{ include "phasor.backend.fullname" . }}-canary
+          port: 80
+{{- end }}

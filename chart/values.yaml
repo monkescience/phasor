@@ -51,6 +51,15 @@ backend:
     smokeTest:
       enabled: true
       replicas: 1
+    httpRoute:
+      enabled: false
+      parentRefs:
+        - name: gateway
+          # namespace: gateway-system
+          # sectionName: https
+      hostnames: []
+        # - api.phasor.example.com
+      pathPrefix: /api
     steps:
       - setWeight: 20
       - pause: { duration: 60s }
