@@ -21,17 +21,20 @@ func SetupRouter(cfg *config.Config, logger *slog.Logger) *chi.Mux {
 func SetupRouterWithHostname(cfg *config.Config, logger *slog.Logger, getHostname instanceapi.HostnameFunc) *chi.Mux {
 	router := chi.NewRouter()
 	router.Use(vital.Recovery(logger))
-	router.Use(vital.RequestLogger(logger))
-	router.Use(vital.TraceContext())
-
-	instanceHandler := instanceapi.NewInstanceHandler(cfg.Version, getHostname)
-	instanceapi.HandlerFromMux(instanceHandler, router)
 
 	healthHandler := vital.NewHealthHandler(
 		vital.WithVersion(cfg.Version),
 		vital.WithEnvironment(cfg.Environment),
 	)
 	router.Mount("/health", healthHandler)
+
+	router.Group(func(r chi.Router) {
+		r.Use(vital.TraceContext())
+		r.Use(vital.RequestLogger(logger))
+
+		instanceHandler := instanceapi.NewInstanceHandler(cfg.Version, getHostname)
+		instanceapi.HandlerFromMux(instanceHandler, r)
+	})
 
 	return router
 }

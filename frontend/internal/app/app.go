@@ -15,20 +15,6 @@ import (
 func SetupRouter(cfg *config.Config, templatesPath string, logger *slog.Logger) (*chi.Mux, error) {
 	router := chi.NewRouter()
 	router.Use(vital.Recovery(logger))
-	router.Use(vital.RequestLogger(logger))
-	router.Use(vital.TraceContext())
-
-	frontendHandler, err := frontend.NewFrontendHandler(
-		templatesPath,
-		cfg.BackendURL,
-		cfg.TileColors,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create frontend handler: %w", err)
-	}
-
-	router.Get("/", frontendHandler.IndexHandler)
-	router.Get("/tiles", frontendHandler.TilesHandler)
 
 	backendChecker, err := health.NewBackendChecker(cfg.BackendURL)
 	if err != nil {
@@ -40,6 +26,22 @@ func SetupRouter(cfg *config.Config, templatesPath string, logger *slog.Logger) 
 		vital.WithCheckers(backendChecker),
 	)
 	router.Mount("/health", healthHandler)
+
+	frontendHandler, err := frontend.NewFrontendHandler(
+		templatesPath,
+		cfg.BackendURL,
+		cfg.TileColors,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create frontend handler: %w", err)
+	}
+
+	router.Group(func(r chi.Router) {
+		r.Use(vital.TraceContext())
+		r.Use(vital.RequestLogger(logger))
+		r.Get("/", frontendHandler.IndexHandler)
+		r.Get("/tiles", frontendHandler.TilesHandler)
+	})
 
 	return router, nil
 }
