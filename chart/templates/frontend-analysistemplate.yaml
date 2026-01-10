@@ -14,8 +14,8 @@ spec:
       provider:
         web:
           {{- if eq .Values.frontend.rollout.strategy "blueGreen" }}
-          url: http://{{ include "phasor.frontend.fullname" . }}-preview:80/health/live
+          url: http://{{ include "phasor.frontend.fullname" . }}-preview.{{ .Release.Namespace }}.svc:80/health/live
           {{- else }}
-          url: http://{{ include "phasor.frontend.fullname" . }}:80/health/live
+          url: http://{{ include "phasor.frontend.fullname" . }}.{{ .Release.Namespace }}.svc:80/health/live
           {{- end }}
           jsonPath: "{$.status}"

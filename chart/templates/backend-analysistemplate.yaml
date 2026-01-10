@@ -13,5 +13,5 @@ spec:
       successCondition: result == "Healthy"
       provider:
         web:
-          url: http://{{ include "phasor.backend.fullname" . }}-canary:80/health/live
+          url: http://{{ include "phasor.backend.fullname" . }}-canary.{{ .Release.Namespace }}.svc:80/health/live
           jsonPath: "{$.status}"
