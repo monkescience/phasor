@@ -7,6 +7,9 @@ metadata:
 spec:
   replicas: {{ .Values.backend.replicaCount }}
   revisionHistoryLimit: 3
+  analysis:
+    successfulRunHistoryLimit: 3
+    unsuccessfulRunHistoryLimit: 3
   selector:
     matchLabels:
       {{- include "phasor.backend.selectorLabels" . | nindent 6 }}
