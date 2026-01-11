@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"hash/fnv"
 	"html/template"
 	"net/http"
 	"path/filepath"
@@ -18,7 +19,6 @@ const (
 	defaultTileCount         = 3
 	maxTileCount             = 20
 	httpClientTimeout        = 5 * time.Second
-	defaultFallbackColor     = "#667eea"
 	httpRequestTimeout       = 3 * time.Second
 	transportMaxIdleConns    = 10
 	transportIdleConnTimeout = 30 * time.Second
@@ -67,39 +67,24 @@ type TilesData struct {
 	Instances []InstanceTileData
 }
 
-// colorTracker assigns unique colors to keys within a single request.
-type colorTracker struct {
-	colors   []string
-	assigned map[string]int
-	nextIdx  int
+// colorPalette holds a list of colors for deterministic assignment.
+type colorPalette struct {
+	colors []string
 }
 
-// newColorTracker creates a new color tracker with the given color palette.
-func newColorTracker(colors []string) *colorTracker {
-	return &colorTracker{
-		colors:   colors,
-		assigned: make(map[string]int),
-		nextIdx:  0,
-	}
+// newColorPalette creates a new color palette with the given colors.
+func newColorPalette(colors []string) *colorPalette {
+	return &colorPalette{colors: colors}
 }
 
-// getColor returns a unique color for the given key.
-// Same key always returns the same color within a request.
-// Different keys get different colors until the palette is exhausted.
-func (ct *colorTracker) getColor(key string) string {
-	if len(ct.colors) == 0 {
-		return defaultFallbackColor
-	}
+// getColor returns a deterministic color for the given key using hash-based assignment.
+// The same key always returns the same color across requests.
+func (cp *colorPalette) getColor(key string) string {
+	h := fnv.New32a()
+	_, _ = h.Write([]byte(key))
+	idx := int(h.Sum32()) % len(cp.colors)
 
-	if idx, ok := ct.assigned[key]; ok {
-		return ct.colors[idx]
-	}
-
-	idx := ct.nextIdx % len(ct.colors)
-	ct.assigned[key] = idx
-	ct.nextIdx++
-
-	return ct.colors[idx]
+	return cp.colors[idx]
 }
 
 // IndexData contains data for rendering the index page.
@@ -176,7 +161,7 @@ func (h *FrontendHandler) TilesHandler(writer http.ResponseWriter, req *http.Req
 		}
 	}
 
-	colorTracker := newColorTracker(h.tileColors)
+	palette := newColorPalette(h.tileColors)
 
 	instances := make([]InstanceTileData, count)
 	for i := range count {
@@ -185,7 +170,7 @@ func (h *FrontendHandler) TilesHandler(writer http.ResponseWriter, req *http.Req
 			info = errorInstanceInfo()
 		}
 
-		tileColor := colorTracker.getColor(info.Hostname + "|" + info.Version)
+		tileColor := palette.getColor(info.Hostname + "|" + info.Version)
 		instances[i] = InstanceTileData{
 			Index:         i + 1,
 			Info:          info,
