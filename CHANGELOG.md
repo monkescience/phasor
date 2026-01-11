@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0](https://github.com/monkescience/phasor/compare/0.8.0...0.9.0) (2026-01-11)
+
+
+### Features
+
+* **chart:** add GAMMA internal HTTPRoute for waypoint traffic routing ([b3976ab](https://github.com/monkescience/phasor/commit/b3976abd48e79205916a626aecee87a529357fab))
+
 ## [0.8.0](https://github.com/monkescience/phasor/compare/0.7.2...0.8.0) (2026-01-10)
 
 
