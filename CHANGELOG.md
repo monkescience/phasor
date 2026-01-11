@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.2](https://github.com/monkescience/phasor/compare/0.9.1...0.9.2) (2026-01-11)
+
+
+### Bug Fixes
+
+* **frontend:** use hash-based color assignment for deterministic tile colors ([02a60d5](https://github.com/monkescience/phasor/commit/02a60d5ae205511f3decf8abd3fba53a462fd229))
+
 ## [0.9.1](https://github.com/monkescience/phasor/compare/0.9.0...0.9.1) (2026-01-11)
 
 
