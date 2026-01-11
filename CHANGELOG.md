@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1](https://github.com/monkescience/phasor/compare/0.9.0...0.9.1) (2026-01-11)
+
+
+### Bug Fixes
+
+* **chart:** use Service parentRef for GAMMA HTTPRoute instead of waypoint Gateway ([059eecc](https://github.com/monkescience/phasor/commit/059eecc8b9f2d8f9738d33180a205ceabd0af4cf))
+
 ## [0.9.0](https://github.com/monkescience/phasor/compare/0.8.0...0.9.0) (2026-01-11)
 
 
