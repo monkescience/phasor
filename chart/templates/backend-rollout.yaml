@@ -17,11 +17,17 @@ spec:
     canary:
       stableService: {{ include "phasor.backend.fullname" . }}
       canaryService: {{ include "phasor.backend.fullname" . }}-canary
-      {{- if .Values.backend.rollout.httpRoute.enabled }}
+      {{- if or .Values.backend.rollout.httpRoute.enabled .Values.backend.rollout.httpRouteInternal.enabled }}
       trafficRouting:
         plugins:
           argoproj-labs/gatewayAPI:
-            httpRoute: {{ include "phasor.backend.fullname" . }}
+            httpRoutes:
+              {{- if .Values.backend.rollout.httpRoute.enabled }}
+              - name: {{ include "phasor.backend.fullname" . }}
+              {{- end }}
+              {{- if .Values.backend.rollout.httpRouteInternal.enabled }}
+              - name: {{ include "phasor.backend.fullname" . }}-internal
+              {{- end }}
             namespace: {{ .Release.Namespace }}
       {{- end }}
       steps:
