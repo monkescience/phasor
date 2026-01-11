@@ -62,7 +62,6 @@ backend:
       pathPrefix: /api
     httpRouteInternal:
       enabled: false
-      waypoint: waypoint
     steps:
       - setWeight: 20
       - pause: { duration: 60s }

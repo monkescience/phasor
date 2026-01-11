@@ -7,9 +7,10 @@ metadata:
     {{- include "phasor.backend.labels" . | nindent 4 }}
 spec:
   parentRefs:
-    - name: {{ .Values.backend.rollout.httpRouteInternal.waypoint }}
-      kind: Gateway
-      group: gateway.networking.k8s.io
+    - name: {{ include "phasor.backend.fullname" . }}
+      kind: Service
+      group: ""
+      port: 80
   rules:
     - matches:
         - path:
